@@ -1,0 +1,2 @@
+variable,test,n,statistic,df,p_value,epsilon_squared,epsilon_squared_ci_lower,epsilon_squared_ci_upper,valid_bootstrap
+age,Kruskal-Wallis,25,0.28748043818466185,2,0.8661127183845678,0,0,0.25305628760425436,5000

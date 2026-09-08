@@ -1,0 +1,26 @@
+participant_id,age,sex,pubertal_development,endocrine_status,uctd_status,periodontal_status,cluster
+1,12,F,Normal,Documented pathology,Documented pathology,No documented pathology,1
+10,14,F,Normal,Documented pathology,Documented pathology,No documented pathology,1
+11,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology,1
+12,14,M,Unknown,Documented pathology,Documented pathology,No documented pathology,1
+13,8,F,Early,Documented pathology,Documented pathology,No documented pathology,1
+14,7,F,Unknown,Documented pathology,Documented pathology,No documented pathology,1
+15,7,F,Early,Documented pathology,Documented pathology,No documented pathology,1
+16,16,F,Unknown,Documented pathology,Documented pathology,No documented pathology,1
+17,11,F,Unknown,Documented pathology,Documented pathology,No documented pathology,1
+18,9,M,Unknown,Unknown,Documented pathology,No documented pathology,2
+19,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology,3
+2,6,M,Normal,Documented pathology,Documented pathology,No documented pathology,1
+20,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology,2
+21,14,M,Unknown,No documented pathology,No documented pathology,Documented pathology,3
+22,16,F,Unknown,No documented pathology,No documented pathology,Documented pathology,1
+23,16,F,Unknown,No documented pathology,No documented pathology,Documented pathology,1
+24,17,M,Unknown,Documented pathology,Documented pathology,No documented pathology,2
+25,16,M,Unknown,Documented pathology,Documented pathology,No documented pathology,3
+3,6,M,Normal,Documented pathology,Documented pathology,No documented pathology,3
+4,9,F,Normal,Documented pathology,Documented pathology,No documented pathology,1
+5,13,M,Delayed,No documented pathology,Documented pathology,No documented pathology,3
+6,14,M,Normal,Documented pathology,Documented pathology,No documented pathology,1
+7,13,M,Normal,Documented pathology,Documented pathology,No documented pathology,3
+8,10,F,Early,No documented pathology,Documented pathology,No documented pathology,1
+9,11,F,Normal,Documented pathology,Documented pathology,No documented pathology,2

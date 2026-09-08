@@ -1,0 +1,30 @@
+variable,cluster,category,n
+sex,1,F,11
+sex,1,M,4
+sex,2,F,1
+sex,2,M,3
+sex,3,M,6
+pubertal_development,1,Normal,5
+pubertal_development,1,Early,3
+pubertal_development,1,Unknown,7
+pubertal_development,2,Normal,1
+pubertal_development,2,Unknown,3
+pubertal_development,3,Normal,2
+pubertal_development,3,Delayed,1
+pubertal_development,3,Unknown,3
+endocrine_status,1,No documented pathology,3
+endocrine_status,1,Documented pathology,12
+endocrine_status,2,Documented pathology,3
+endocrine_status,2,Unknown,1
+endocrine_status,3,No documented pathology,2
+endocrine_status,3,Documented pathology,4
+uctd_status,1,No documented pathology,2
+uctd_status,1,Documented pathology,13
+uctd_status,2,Documented pathology,4
+uctd_status,3,No documented pathology,1
+uctd_status,3,Documented pathology,5
+periodontal_status,1,No documented pathology,13
+periodontal_status,1,Documented pathology,2
+periodontal_status,2,No documented pathology,4
+periodontal_status,3,No documented pathology,5
+periodontal_status,3,Documented pathology,1

@@ -1,0 +1,10 @@
+metric,value
+Minimum pairwise Pearson,0.9999889915461593
+Median pairwise Pearson,0.9999955220471575
+Minimum pairwise Spearman,0.9999822469862572
+Median pairwise Spearman,0.9999900616807382
+Integrated absorbance CV (%),0.8187663943672774
+Median pointwise CV (%),0.8542025069922996
+95th percentile pointwise CV (%),1.174046212992733
+Archived strip vs four-strip mean Pearson,0.9999991825802927
+Archived strip vs four-strip mean Spearman,0.9999957948683891

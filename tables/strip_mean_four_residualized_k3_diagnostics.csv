@@ -1,0 +1,5 @@
+metric,value
+ARI vs baseline,0.4071146245059289
+Average silhouette at k=3,0.37126592298544175
+Negative silhouette count at k=3,2
+Three-PC cumulative variance (%),89.8237650611702

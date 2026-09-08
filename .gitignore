@@ -1,0 +1,21 @@
+.DS_Store
+__MACOSX/
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+renv/library/
+renv/staging/
+analysis/.quarto/
+audit_private/
+
+# Restricted source data
+data/pediatric/raw/
+data/adult/Data_spectra.xlsx
+data/adult/Data_adult.xlsx
+data/adult/*source*
+data/adult/*private*
+
+# Temporary/editor files
+~$*
+*.tmp

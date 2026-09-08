@@ -1,0 +1,10 @@
+metric,value
+Average silhouette in PC1-PC3 clustering space,0.43424880431781065
+Average silhouette in full SNV spectral space,0.37543866471277776
+PERMANOVA R2 in full SNV spectral space,0.5920095013217906
+PERMANOVA pseudo-F in full SNV spectral space,15.961412179051573
+PERMANOVA permutation p in full SNV spectral space,1e-4
+Betadisper ANOVA F in full SNV spectral space,1.0738674753187747
+Betadisper ANOVA p in full SNV spectral space,0.35892944341600663
+Betadisper permutation F in full SNV spectral space,1.0738674753187747
+Betadisper permutation p in full SNV spectral space,0.3602

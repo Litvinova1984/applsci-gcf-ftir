@@ -1,0 +1,6 @@
+domain,lower,upper,n_wavenumbers,minimum_retained_wavenumber,maximum_retained_wavenumber
+D1,876,1127,130,876.29,1125.28
+D2,1150,1313,85,1150.37,1312.51
+D3,1382,1413,16,1383.92,1412.88
+D4,1477,1706,118,1478.5,1704.33
+D5,2942,3092,77,2943.49,3090.18

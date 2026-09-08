@@ -1,0 +1,10 @@
+metric,value
+Patient-strip Spearman KW p,1.6851908702715935e-4
+Strip-aligned component removal ARI vs baseline,0.4071146245059289
+Strip-residualized cluster 1 n,8
+Strip-residualized cluster 2 n,11
+Strip-residualized cluster 3 n,6
+Excluding 870-1121 cm^-1 ARI vs baseline,0.6445497630331753
+No-D1 cluster 1 n,18
+No-D1 cluster 2 n,4
+No-D1 cluster 3 n,3

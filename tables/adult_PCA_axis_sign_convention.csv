@@ -1,0 +1,4 @@
+PC,flip,target_category,target_n,aligned_target_pole
+PC2,1,caries_factor == H,2,negative
+PC4,1,Parodont == G,3,negative
+PC5,1,Parodont == M,1,positive

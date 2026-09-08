@@ -1,0 +1,48 @@
+section,metric,value_numeric,value_text
+Additional internal characterization (full SNV spectral space),Average silhouette in PC1-PC3 clustering space,0.43424880431781065,0.4342488043
+Additional internal characterization (full SNV spectral space),Average silhouette in full SNV spectral space,0.37543866471277776,0.3754386647
+Additional internal characterization (full SNV spectral space),PERMANOVA R2 in full SNV spectral space,0.5920095013217906,0.5920095013
+Additional internal characterization (full SNV spectral space),PERMANOVA pseudo-F in full SNV spectral space,15.961412179051573,15.9614121791
+Additional internal characterization (full SNV spectral space),PERMANOVA permutation p in full SNV spectral space,1e-4,0.0001000000
+Additional internal characterization (full SNV spectral space),Betadisper ANOVA F in full SNV spectral space,1.0738674753187747,1.0738674753
+Additional internal characterization (full SNV spectral space),Betadisper ANOVA p in full SNV spectral space,0.35892944341600663,0.3589294434
+Additional internal characterization (full SNV spectral space),Betadisper permutation F in full SNV spectral space,1.0738674753187747,1.0738674753
+Additional internal characterization (full SNV spectral space),Betadisper permutation p in full SNV spectral space,0.3602,0.3602000000
+Baseline,Retained PCs,3,3
+Baseline,Cumulative variance explained (%),89.28182549155741,89.28182549
+Baseline,Baseline k,3,3
+Baseline,Cluster sizes,NA,15/4/6
+Baseline,Average silhouette,0.43424880431781065,0.4342488043
+Baseline,Participants with negative silhouette,0,0
+PCA dimensionality sensitivity,PC counts with exact baseline recovery,NA,"2,3,5,6"
+PCA dimensionality sensitivity,Number of tested PC counts,6,6
+PCA dimensionality sensitivity,Number with exact baseline recovery,4,4
+k = 3 versus k = 2,Silhouette k=2,0.4376790349403968,0.4376790349
+k = 3 versus k = 2,Silhouette k=3,0.43424880431781065,0.4342488043
+k = 3 versus k = 2,Calinski-Harabasz k=2,17.64630410871155,17.6463041087
+k = 3 versus k = 2,Calinski-Harabasz k=3,21.111927430986817,21.1119274310
+k = 3 versus k = 2,Davies-Bouldin k=2,0.8975678104256992,0.8975678104
+k = 3 versus k = 2,Davies-Bouldin k=3,0.7422319633909878,0.7422319634
+Leave-one-out,Mean ARI,0.8107124012133443,0.8107124012
+Leave-one-out,Median ARI,1,1.0000000000
+Leave-one-out,Exact recovery proportion,0.68,0.6800000000
+Leave-one-out,ARI >= 0.8 proportion,0.72,0.7200000000
+80% subsampling,Mean ARI,0.6472360149036428,0.6472360149
+80% subsampling,Median ARI,0.593653514353392,0.5936535144
+80% subsampling,Exact recovery proportion,0.348,0.3480000000
+80% subsampling,ARI >= 0.8 proportion,0.436,0.4360000000
+Pairwise consensus,Within-cluster mean consensus,0.7569366810572974,0.75693668106
+Pairwise consensus,Within-cluster median consensus,0.8338537801962239,0.83385378020
+Pairwise consensus,Between-cluster mean consensus,0.11481603388461507,0.11481603388
+Pairwise consensus,Between-cluster median consensus,0.01793087506177563,0.01793087506
+Bootstrap,Mean ARI,0.6008857949547477,0.6008857950
+Bootstrap,Median ARI,0.5787256450763559,0.5787256451
+Bootstrap,Exact recovery proportion,0.14,0.1400000000
+Bootstrap,ARI >= 0.8 proportion,0.318,0.3180000000
+Bootstrap,Mean unique participants per bootstrap sample,15.979,15.9790000000
+Bootstrap cluster-specific Jaccard,Cluster 1 mean Jaccard,0.7676411062192022,0.7676411062
+Bootstrap cluster-specific Jaccard,Cluster 2 mean Jaccard,0.5469156222690278,0.5469156223
+Bootstrap cluster-specific Jaccard,Cluster 3 mean Jaccard,0.8273487137862138,0.8273487138
+Cluster-specific silhouette,Cluster 1 mean silhouette,0.4484225246257138,0.4484225246
+Cluster-specific silhouette,Cluster 2 mean silhouette,0.5141523310435254,0.5141523310
+Cluster-specific silhouette,Cluster 3 mean silhouette,0.3455454857309096,0.3455454857

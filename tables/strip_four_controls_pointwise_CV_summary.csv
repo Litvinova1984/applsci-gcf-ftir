@@ -1,0 +1,5 @@
+metric,value
+Median pointwise CV (%),0.8542025069922996
+Mean pointwise CV (%),0.8883620436165934
+95th percentile pointwise CV (%),1.174046212992733
+Maximum pointwise CV (%),4.031272032658266

@@ -1,0 +1,16 @@
+reference_1,reference_2,ARI
+archived_etalon,strip_01,1
+archived_etalon,strip_02,1
+archived_etalon,strip_03,1
+archived_etalon,strip_04,1
+archived_etalon,mean_four_strips,1
+strip_01,strip_02,1
+strip_01,strip_03,1
+strip_01,strip_04,1
+strip_01,mean_four_strips,1
+strip_02,strip_03,1
+strip_02,strip_04,1
+strip_02,mean_four_strips,1
+strip_03,strip_04,1
+strip_03,mean_four_strips,1
+strip_04,mean_four_strips,1

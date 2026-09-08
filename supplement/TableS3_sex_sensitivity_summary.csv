@@ -1,0 +1,28 @@
+section,metric,value_numeric,value_text
+Clinical metadata associations,Sex x cluster Fisher p,0.00299501951810469,0.002995019518
+Clinical metadata associations,Sex x cluster Cramer's V,0.6400954789890507,0.640095478989
+Clinical metadata associations,Sex x cluster Cramer's V CI lower,0.41389088902293353,0.413890889023
+Clinical metadata associations,Sex x cluster Cramer's V CI upper,0.9185586535436918,0.918558653544
+Clinical metadata associations,Age x cluster Kruskal-Wallis p,0.8661127183845678,0.866112718385
+Clinical metadata associations,Age epsilon-squared,0,0
+Clinical metadata associations,Endocrine x cluster Fisher p,0.2934782608695635,0.29347826087
+Clinical metadata associations,UCTD x cluster Fisher p,1,1
+Clinical metadata associations,Periodontal x cluster Fisher p,1,1
+PC1 sex association,Wilcoxon p,0.01597177085937349,0.01597177086
+PC1 sex association,Rank-biserial correlation F vs M,-0.5641025641025641,-0.5641025641
+PC1 sex association,Rank-biserial 95% CI lower,-0.8974358974358975,-0.89743589744
+PC1 sex association,Rank-biserial 95% CI upper,-0.17948717948717952,-0.17948717949
+PC1 sex association,Hedges g F minus M,-1.174310839417874,-1.17431083942
+PC1 sex association,Hedges g 95% CI lower,-2.076261057121073,-2.07626105712
+PC1 sex association,Hedges g 95% CI upper,-0.5822163275566001,-0.58221632756
+PC1 sex association,Hodges-Lehmann F minus M,-6.0890326317723025,-6.08903263177
+PC1 sex association,Hodges-Lehmann 95% CI lower,-12.598880038732354,-12.59888003873
+PC1 sex association,Hodges-Lehmann 95% CI upper,-1.2330508542760432,-1.23305085428
+Sex-residualized sensitivity,ARI vs baseline,0.1341396371632765,0.1341396372
+Sex-residualized sensitivity,Participants changing aligned cluster,10,10
+Sex-residualized sensitivity,Residualized average silhouette,0.3380496093426003,0.3380496093
+Sex-residualized sensitivity,Residualized 3-PC cumulative variance (%),87.5295123380811,87.5295123381
+Sex-residualized sensitivity,Sex x residualized cluster Fisher p,0.2816314443397483,0.2816314443
+Sex-residualized sensitivity,Sex x residualized cluster Cramer's V,0.37231947957606903,0.3723194796
+Sex-residualized sensitivity,Sex x residualized cluster Cramer's V CI lower,0.16666666666666666,0.1666666667
+Sex-residualized sensitivity,Sex x residualized cluster Cramer's V CI upper,0.6669264777951308,0.6669264778
