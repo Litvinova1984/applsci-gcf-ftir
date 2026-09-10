@@ -1,4 +1,4 @@
-# Candidate Spectral Phenotypes of Pediatric Gingival Crevicular Fluid Identified by FTIR Spectroscopy and Chemometric Analysis
+# Candidate FTIR-Derived Spectral Phenotypes of Pediatric Gingival Crevicular Fluid Identified by Chemometric Analysis
 
 Public reproducibility repository for the revised *Applied Sciences* manuscript.
 
