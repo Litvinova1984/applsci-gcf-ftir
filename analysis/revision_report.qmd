@@ -411,17 +411,17 @@ names(baseline_rows) <- c("Metric", "Value")
 kable_clean(baseline_rows)
 ```
 
-# 4. Cluster-number validation
+# 4. Cluster-number internal evaluation
 
 Internal indices were evaluated for **k = 2--6** in the baseline three-PC space.
 
 ```{r}
-#| label: k-validation
+#| label: k-internal-evaluation
 
 kable_clean(
   robustness$k_results,
   digits = 4,
-  caption = "Internal cluster-validity indices for k = 2-6."
+  caption = "Internal clustering indices for k = 2-6."
 )
 ```
 
@@ -455,15 +455,32 @@ kable_clean(
 )
 ```
 
-The full-SNV-space metrics are retained only as additional internal characterization and are not treated as independent validation.
+The full-SNV-space metrics are retained only as descriptive internal characterization and are not treated as independent inferential validation.
 
 ```{r}
 #| label: full-snv-characterization
 
+full_snv_descriptive <- robustness$baseline_internal_characterization |>
+  dplyr::filter(
+    metric %in% c(
+      "Average silhouette in PC1-PC3 clustering space",
+      "Average silhouette in full SNV spectral space",
+      "PERMANOVA R2 in full SNV spectral space"
+    )
+  ) |>
+  dplyr::mutate(
+    section = "Descriptive characterization (full SNV spectral space)",
+    metric = dplyr::if_else(
+      metric == "PERMANOVA R2 in full SNV spectral space",
+      "PERMANOVA R² in full SNV spectral space",
+      metric
+    )
+  )
+
 kable_clean(
-  robustness$baseline_internal_characterization,
+  full_snv_descriptive,
   digits = 4,
-  caption = "Additional internal characterization in the full SNV spectral space."
+  caption = "Descriptive characterization in the full SNV spectral space."
 )
 ```
 
@@ -678,27 +695,9 @@ kable_clean(
 )
 ```
 
-## Domain-level tests
+## Descriptive post-clustering domain characterization
 
-```{r}
-#| label: domain-kw
-
-kable_clean(
-  domain_obj$domain_kw,
-  digits = 6,
-  caption = "Kruskal-Wallis tests for D1-D5."
-)
-```
-
-```{r}
-#| label: domain-pairwise
-
-kable_clean(
-  domain_obj$domain_pairwise,
-  digits = 6,
-  caption = "Pairwise Wilcoxon tests with Benjamini-Hochberg correction."
-)
-```
+The D1--D5 domains and the cluster labels were derived from the same pediatric spectral dataset. Therefore, domain-level inferential tests are not displayed or used as independent inferential validation in this report. The frozen exploratory test outputs remain available among the machine-readable analysis tables for auditability, but the manuscript interpretation is based on descriptive cluster-wise domain distributions and signed multidomain profiles.
 
 ```{r}
 #| label: figure5

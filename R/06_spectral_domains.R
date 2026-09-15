@@ -9,13 +9,17 @@
 #   2. summarizes VIP scores as the maximum VIP across components;
 #   3. identifies contiguous VIP-enriched spectral regions (VIP > 1);
 #   4. computes participant-level scores for the fixed D1-D5 domains;
-#   5. performs Kruskal-Wallis and pairwise Wilcoxon-BH tests;
+#   5. computes exploratory Kruskal-Wallis and pairwise Wilcoxon-BH
+#      outputs for auditability (not independent inferential validation);
 #   6. derives cluster-level standardized domain signatures;
 #   7. prepares median raw absorbance spectra + IQR for later figures.
 #
 # PLS-DA is used as a secondary supervised characterization of
 # spectral variables associated with the already-defined baseline
-# clusters. It is not used to select or validate the cluster solution.
+# clusters. Because both the clusters and D1-D5 are derived from the
+# same pediatric spectral dataset, domain-level test outputs are
+# retained only for auditability and are not used as independent
+# inferential validation in the manuscript or final report.
 # ============================================================
 
 if (!file.exists(file.path("R", "00_utils.R"))) {
@@ -521,10 +525,10 @@ print(vip_regions, n = Inf, width = Inf)
 cat("\nVIP > 1 coverage within D1-D5:\n")
 print(vip_domain_coverage, n = Inf, width = Inf)
 
-cat("\nKruskal-Wallis tests:\n")
+cat("\nExploratory Kruskal-Wallis outputs (audit only):\n")
 print(domain_kw, n = Inf, width = Inf)
 
-cat("\nPairwise Wilcoxon tests with BH correction:\n")
+cat("\nExploratory pairwise Wilcoxon-BH outputs (audit only):\n")
 print(domain_pairwise, n = Inf, width = Inf)
 
 cat("\nSigned standardized cluster-domain signatures:\n")

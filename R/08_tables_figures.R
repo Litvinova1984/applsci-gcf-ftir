@@ -15,7 +15,7 @@
 #
 # Main figures:
 #   Figure 1  Curated analytical workflow asset (copied, not generated)
-#   Figure 2  PCA / clustering / validation
+#   Figure 2  PCA / clustering / internal stability
 #   Figure 3  Clinical composition
 #   Figure 4  Supplementary references + clean-strip reproducibility
 #   Figure 5  D1-D5 distributions
@@ -24,7 +24,7 @@
 #
 # Supplementary:
 #   Table S1 adult domain-level clinical/spectral map
-#   Table S2 cluster validation
+#   Table S2 cluster internal evaluation / stability
 #   Table S3 sex sensitivity
 #   Table S4 strip technical reproducibility
 #   Table S5/S5b substrate-reference invariance
@@ -222,7 +222,16 @@ supp_pc_cols <- c(
   "PC5" = "#55A868"
 )
 
-theme_pub <- function(base_size = 11) {
+theme_pub <- function(
+    base_size = 11,
+    title_size = base_size * 1.12,
+    subtitle_size = base_size * 0.95,
+    axis_title_size = base_size,
+    axis_text_size = base_size * 0.90,
+    strip_size = base_size * 0.95,
+    legend_title_size = base_size * 0.95,
+    legend_text_size = base_size * 0.90
+) {
   ggplot2::theme_minimal(
     base_size = base_size
   ) +
@@ -231,15 +240,34 @@ theme_pub <- function(base_size = 11) {
         ggplot2::element_blank(),
       plot.title =
         ggplot2::element_text(
-          face = "bold"
+          face = "bold",
+          size = title_size
+        ),
+      plot.subtitle =
+        ggplot2::element_text(
+          size = subtitle_size
+        ),
+      axis.title =
+        ggplot2::element_text(
+          size = axis_title_size
+        ),
+      axis.text =
+        ggplot2::element_text(
+          size = axis_text_size
         ),
       strip.text =
         ggplot2::element_text(
-          face = "bold"
+          face = "bold",
+          size = strip_size
         ),
       legend.title =
         ggplot2::element_text(
-          face = "bold"
+          face = "bold",
+          size = legend_title_size
+        ),
+      legend.text =
+        ggplot2::element_text(
+          size = legend_text_size
         )
     )
 }
@@ -733,11 +761,31 @@ readr::write_csv(
 
 
 # ------------------------------------------------------------
-# 7. Table S2: cluster validation summary
+# 7. Table S2: cluster internal evaluation / stability summary
 # ------------------------------------------------------------
 
+table_s2_public <- robustness_summary |>
+  dplyr::filter(
+    !grepl(
+      "PERMANOVA pseudo-F|PERMANOVA permutation p|Betadisper",
+      metric
+    )
+  ) |>
+  dplyr::mutate(
+    section = dplyr::if_else(
+      section == "Additional internal characterization (full SNV spectral space)",
+      "Descriptive characterization (full SNV spectral space)",
+      section
+    ),
+    metric = dplyr::if_else(
+      metric == "PERMANOVA R2 in full SNV spectral space",
+      "PERMANOVA R² in full SNV spectral space",
+      metric
+    )
+  )
+
 readr::write_csv(
-  robustness_summary,
+  table_s2_public,
   file.path(
     supplement_dir,
     "TableS2_cluster_validation_summary.csv"
@@ -839,7 +887,7 @@ file.copy(
 
 # Figure 1 is curated externally and is intentionally NOT regenerated here.
 # The final asset must already contain the corrected analytical windows,
-# PCA-based hierarchical clustering terminology, internal validation,
+# PCA-based hierarchical clustering terminology, internal stability,
 # and exploratory adult-reference domain mapping.
 
 fig1_png <- file.path(
@@ -872,7 +920,7 @@ fig1_paths <- fig1_png
 
 
 # ============================================================
-# FIGURE 2. PCA / CLUSTERING / VALIDATION
+# FIGURE 2. PCA / CLUSTERING / INTERNAL STABILITY
 # ============================================================
 
 
@@ -915,7 +963,7 @@ p2_A <- ggplot2::ggplot(
     values = cluster_cols
   ) +
   ggplot2::labs(
-    title = "A. Baseline PCA / three-cluster solution",
+    title = "A. Baseline PCA",
     x = paste0(
       "PC1 (",
       round(pc1_var, 1),
@@ -928,7 +976,7 @@ p2_A <- ggplot2::ggplot(
     ),
     color = "Cluster"
   ) +
-  theme_pub()
+  theme_pub(base_size = 15)
 
 
 # ------------------------------------------------------------
@@ -991,9 +1039,7 @@ p2_B <- ggplot2::ggplot(
     x = "Number of clusters (k)",
     y = NULL
   ) +
-  theme_pub(
-    base_size = 9.5
-  )
+  theme_pub(base_size = 13.5)
 
 
 # ------------------------------------------------------------
@@ -1028,11 +1074,11 @@ p2_C <- ggplot2::ggplot(
     )
   ) +
   ggplot2::labs(
-    title = "C. Sensitivity to retained PCA dimensionality",
+    title = "C. PCA-dimension sensitivity",
     x = "Number of retained PCs",
     y = "ARI vs baseline 3-PC partition"
   ) +
-  theme_pub()
+  theme_pub(base_size = 14.5)
 
 
 # ------------------------------------------------------------
@@ -1071,11 +1117,11 @@ p2_D <- ggplot2::ggplot(
     guide = "none"
   ) +
   ggplot2::labs(
-    title = "D. Baseline cluster-wise silhouette",
+    title = "D. Cluster silhouettes",
     x = NULL,
     y = "Silhouette width"
   ) +
-  theme_pub()
+  theme_pub(base_size = 14.5)
 
 Figure2 <- (
   p2_A |
@@ -1143,7 +1189,7 @@ p3_A <- ggplot2::ggplot(
     y = "Participants",
     fill = "Sex"
   ) +
-  theme_pub()
+  theme_pub(base_size = 14)
 
 p3_B <- ggplot2::ggplot(
   clinical_df,
@@ -1170,7 +1216,7 @@ p3_B <- ggplot2::ggplot(
     x = NULL,
     y = "Age, years"
   ) +
-  theme_pub()
+  theme_pub(base_size = 14)
 
 clinical_status_long <- clinical_df |>
   dplyr::select(
@@ -1219,14 +1265,12 @@ p3_C <- ggplot2::ggplot(
     nrow = 1
   ) +
   ggplot2::labs(
-    title = "C-E. Documented clinical-status composition",
+    title = "C-E. Clinical-status composition",
     x = NULL,
     y = "Participants",
     fill = "Status"
   ) +
-  theme_pub(
-    base_size = 9.5
-  ) +
+  theme_pub(base_size = 13.5) +
   ggplot2::theme(
     axis.text.x =
       ggplot2::element_text(
@@ -1490,7 +1534,7 @@ p4_A <- ggplot2::ggplot() +
       label = label
     ),
     nudge_y = 0.6,
-    size = 2.7,
+    size = 3.2,
     check_overlap = TRUE
   ) +
   ggplot2::scale_color_manual(
@@ -1506,7 +1550,7 @@ p4_A <- ggplot2::ggplot() +
     )
   ) +
   ggplot2::labs(
-    title = "A. Active pediatric spectra and supplementary references",
+    title = "A. Pediatric spectra and references",
     x = paste0(
       "PC1 (",
       round(
@@ -1526,9 +1570,7 @@ p4_A <- ggplot2::ggplot() +
     color = "Cluster",
     shape = "Reference"
   ) +
-  theme_pub(
-    base_size = 10
-  )
+  theme_pub(base_size = 13)
 
 
 # ------------------------------------------------------------
@@ -1580,18 +1622,16 @@ p4_B <- ggplot2::ggplot(
     color = "black"
   ) +
   ggplot2::labs(
-    title = "B. Distance of clean-strip references to cluster centroids",
-    subtitle = "All individual clean references identify Cluster 1 as nearest",
+    title = "B. Clean-strip distances",
+    subtitle = "All clean references are nearest Cluster 1",
     x = NULL,
     y = "Euclidean distance in first five pediatric PCs"
   ) +
-  theme_pub(
-    base_size = 9.5
-  )
+  theme_pub(base_size = 12.5)
 
 
 # ------------------------------------------------------------
-# 22. Figure 4C: four unused strips + archived reference
+# 22. Figure 4C: archived reference + mean of four unused strips
 # ------------------------------------------------------------
 
 X_strips_raw <- strip_obj$
@@ -1622,10 +1662,13 @@ archived_strip_raw <- extract_source_spectrum(
   "etalon"
 )
 
+mean_unused_strip_raw <- colMeans(
+  X_strips_raw
+)
+
 strip_overlay_matrix <- rbind(
-  X_strips_raw,
-  archived_etalon =
-    archived_strip_raw
+  `Archived clean strip` = archived_strip_raw,
+  `Mean of four unused strips` = mean_unused_strip_raw
 )
 
 strip_overlay <- tibble::tibble(
@@ -1655,91 +1698,79 @@ strip_overlay <- tibble::tibble(
     )
 ) |>
   dplyr::mutate(
+    reference = factor(
+      reference,
+      levels = c(
+        "Archived clean strip",
+        "Mean of four unused strips"
+      )
+    ),
     window =
       dplyr::if_else(
         wavenumber > 2000,
-        "3400-2800 cm^-1",
-        "1800-870 cm^-1"
+        "3400*'–'*2800~cm^{-1}",
+        "1800*'–'*870~cm^{-1}"
       )
   )
 
-metric_value <- function(metric_name) {
-  strip_technical_summary$value[
-    strip_technical_summary$metric ==
-      metric_name
-  ][1]
-}
-
-strip_caption <- paste0(
-  "Four unused strips: minimum pairwise Pearson r = ",
-  format(
-    metric_value(
-      "Minimum pairwise Pearson"
-    ),
-    digits = 7
-  ),
-  "; minimum Spearman rho = ",
-  format(
-    metric_value(
-      "Minimum pairwise Spearman"
-    ),
-    digits = 7
-  ),
-  "; integrated absorbance CV = ",
-  round(
-    metric_value(
-      "Integrated absorbance CV (%)"
-    ),
-    2
-  ),
-  "%; median pointwise CV = ",
-  round(
-    metric_value(
-      "Median pointwise CV (%)"
-    ),
-    2
-  ),
-  "%."
-)
-
-p4_C <- ggplot2::ggplot(
-  strip_overlay,
-  ggplot2::aes(
-    x = wavenumber,
-    y = absorbance,
-    group = reference,
-    linetype = reference
-  )
-) +
+p4_C <- ggplot2::ggplot() +
+  # Draw the archived reference first.
   ggplot2::geom_line(
+    data = dplyr::filter(
+      strip_overlay,
+      reference == "Archived clean strip"
+    ),
+    ggplot2::aes(
+      x = wavenumber,
+      y = absorbance,
+      linetype = "Archived clean strip"
+    ),
     linewidth = 0.55,
-    alpha = 0.85
+    color = "black",
+    alpha = 0.95
+  ) +
+  # Draw the four-strip mean last and slightly thicker so its dashed
+  # pattern remains visible even where the two spectra nearly overlap.
+  ggplot2::geom_line(
+    data = dplyr::filter(
+      strip_overlay,
+      reference == "Mean of four unused strips"
+    ),
+    ggplot2::aes(
+      x = wavenumber,
+      y = absorbance,
+      linetype = "Mean of four unused strips"
+    ),
+    linewidth = 0.85,
+    color = "black",
+    alpha = 0.95
   ) +
   ggplot2::facet_wrap(
     ~ window,
     scales = "free_x",
-    ncol = 1
+    ncol = 1,
+    labeller = ggplot2::labeller(
+      window = ggplot2::label_parsed
+    )
   ) +
   ggplot2::scale_x_reverse() +
+  ggplot2::scale_linetype_manual(
+    values = c(
+      "Archived clean strip" = "solid",
+      "Mean of four unused strips" = "22"
+    )
+  ) +
   ggplot2::labs(
-    title = "C. Reproducibility of independent unused strips",
+    title = "C. Unused-strip reproducibility",
     x = expression(
       "Wavenumber (cm"^{-1}*")"
     ),
     y = "Absorbance",
-    linetype = "Reference",
-    caption = strip_caption
+    linetype = "Reference"
   ) +
-  theme_pub(
-    base_size = 9
-  ) +
+  theme_pub(base_size = 11.5) +
   ggplot2::theme(
-    legend.position = "bottom",
-    plot.caption =
-      ggplot2::element_text(
-        hjust = 0,
-        size = 8.5
-      )
+    legend.position = "bottom"
   )
 
 Figure4 <- p4_A /
@@ -1790,27 +1821,6 @@ domain_long <- domain_obj$
       )
   )
 
-domain_kw <- domain_obj$
-  domain_kw |>
-  dplyr::mutate(
-    domain =
-      factor(
-        domain,
-        levels = paste0(
-          "D",
-          1:5
-        )
-      ),
-    p_label =
-      paste0(
-        "Kruskal-Wallis p = ",
-        format.pval(
-          p,
-          digits = 3,
-          eps = 1e-4
-        )
-      )
-  )
 
 p5 <- ggplot2::ggplot(
   domain_long,
@@ -1839,32 +1849,16 @@ p5 <- ggplot2::ggplot(
     guide = "none"
   ) +
   ggplot2::labs(
-    title = "Discriminative spectral-domain measures across the three FTIR-derived phenotypes",
-    subtitle = paste(
-      paste0(
-        as.character(
-          domain_kw$domain
-        ),
-        ": ",
-        domain_kw$p_label
-      ),
-      collapse = "   |   "
-    ),
+    title = "Spectral-domain distributions across pediatric GCF clusters",
     x = NULL,
     y = "Mean SNV-normalized spectral intensity within domain"
   ) +
-  theme_pub(
-    base_size = 9.5
-  ) +
+  theme_pub(base_size = 14) +
   ggplot2::theme(
     axis.text.x =
       ggplot2::element_text(
         angle = 35,
         hjust = 1
-      ),
-    plot.subtitle =
-      ggplot2::element_text(
-        size = 8.5
       )
   )
 
@@ -1893,8 +1887,8 @@ raw_summary <- domain_obj$
     window =
       dplyr::if_else(
         wavenumber > 2000,
-        "3400-2800 cm^-1",
-        "1800-870 cm^-1"
+        "3400*'–'*2800~cm^{-1}",
+        "1800*'–'*870~cm^{-1}"
       )
   )
 
@@ -1910,8 +1904,8 @@ domain_plot_defs <- tibble::tribble(
     window =
       dplyr::if_else(
         lower > 2000,
-        "3400-2800 cm^-1",
-        "1800-870 cm^-1"
+        "3400*'–'*2800~cm^{-1}",
+        "1800*'–'*870~cm^{-1}"
       )
   )
 
@@ -1953,7 +1947,10 @@ p6 <- ggplot2::ggplot() +
   ggplot2::facet_wrap(
     ~ window,
     scales = "free_x",
-    ncol = 1
+    ncol = 1,
+    labeller = ggplot2::labeller(
+      window = ggplot2::label_parsed
+    )
   ) +
   ggplot2::scale_x_reverse() +
   ggplot2::scale_color_manual(
@@ -1964,7 +1961,7 @@ p6 <- ggplot2::ggplot() +
   ) +
   ggplot2::labs(
     title = NULL,
-    subtitle = "Lines: cluster medians; ribbons: interquartile ranges; shaded intervals: D1-D5",
+    subtitle = "Cluster medians with IQR; shaded intervals: D1-D5",
     x = expression(
       "Wavenumber (cm"^{-1}*")"
     ),
@@ -1972,9 +1969,7 @@ p6 <- ggplot2::ggplot() +
     color = "Cluster",
     fill = "Cluster"
   ) +
-  theme_pub(
-    base_size = 10
-  ) +
+  theme_pub(base_size = 13.5) +
   ggplot2::theme(
     legend.position = "bottom"
   )
@@ -2036,7 +2031,7 @@ p7 <- ggplot2::ggplot(
         standardized_effect
       )
     ),
-    size = 4.2
+    size = 4.8
   ) +
   ggplot2::scale_fill_gradient2(
     low = "#3B4CC0",
@@ -2045,14 +2040,12 @@ p7 <- ggplot2::ggplot(
     midpoint = 0
   ) +
   ggplot2::labs(
-    title = "Signed standardized multidomain spectral signatures",
+    title = "Signed multidomain spectral signatures",
     x = "Spectral domain",
     y = NULL,
     fill = "Standardized\ndeviation"
   ) +
-  theme_pub(
-    base_size = 11
-  ) +
+  theme_pub(base_size = 12.5) +
   ggplot2::theme(
     panel.grid =
       ggplot2::element_blank()
@@ -2163,25 +2156,23 @@ pS1 <- ggplot2::ggplot(
     )
   ) +
   ggplot2::labs(
-    title = "Repeated-subsampling consensus matrix",
+    title = "Subsampling consensus matrix",
     x = NULL,
     y = NULL,
     fill = "Consensus"
   ) +
-  theme_pub(
-    base_size = 8
-  ) +
+  theme_pub(base_size = 10.5) +
   ggplot2::theme(
     axis.text.x =
       ggplot2::element_text(
         angle = 90,
         vjust = 0.5,
         hjust = 1,
-        size = 6
+        size = 8.5
       ),
     axis.text.y =
       ggplot2::element_text(
-        size = 6
+        size = 8.5
       ),
     panel.grid =
       ggplot2::element_blank()
@@ -2258,9 +2249,7 @@ pS2_A <- ggplot2::ggplot(
     color = "Baseline cluster",
     shape = "Sex"
   ) +
-  theme_pub(
-    base_size = 9.5
-  )
+  theme_pub(base_size = 13)
 
 pS2_B <- ggplot2::ggplot(
   sex_resid,
@@ -2278,23 +2267,13 @@ pS2_B <- ggplot2::ggplot(
     values = cluster_cols
   ) +
   ggplot2::labs(
-    title = paste0(
-      "B. PCA after removing sex-associated spectral component; ARI = ",
-      sprintf(
-        "%.3f",
-        sex_obj$
-          sex_residualized_summary$
-          ARI_vs_baseline
-      )
-    ),
+    title = "B. Sex-residualized PCA",
     x = "Residual PC1",
     y = "Residual PC2",
     color = "Baseline cluster",
     shape = "Sex"
   ) +
-  theme_pub(
-    base_size = 9.5
-  )
+  theme_pub(base_size = 13)
 
 FigureS2 <- pS2_A |
   pS2_B
@@ -2356,7 +2335,7 @@ pS3 <- ggplot2::ggplot(
       )
     ),
     vjust = -0.35,
-    size = 4
+    size = 4.5
   ) +
   ggplot2::coord_cartesian(
     ylim = c(
@@ -2365,11 +2344,11 @@ pS3 <- ggplot2::ggplot(
     )
   ) +
   ggplot2::labs(
-    title = "Sensitivity of the pediatric partition to substrate-associated signal",
+    title = "Partition sensitivity to substrate signal",
     x = NULL,
     y = "ARI vs baseline partition"
   ) +
-  theme_pub() +
+  theme_pub(base_size = 11.5) +
   ggplot2::theme(
     axis.text.x =
       ggplot2::element_text(
@@ -2404,8 +2383,8 @@ adult_loading_long <- adult_loading_aligned |>
     window =
       dplyr::if_else(
         wavenumber > 2000,
-        "3400-2800 cm^-1",
-        "1800-870 cm^-1"
+        "3400*'–'*2800~cm^{-1}",
+        "1800*'–'*870~cm^{-1}"
       )
   )
 
@@ -2420,8 +2399,8 @@ adult_domains_for_plot <- domain_plot_defs |>
     window =
       dplyr::if_else(
         lower > 2000,
-        "3400-2800 cm^-1",
-        "1800-870 cm^-1"
+        "3400*'–'*2800~cm^{-1}",
+        "1800*'–'*870~cm^{-1}"
       )
   )
 
@@ -2458,20 +2437,21 @@ pS4 <- ggplot2::ggplot() +
   ) +
   ggplot2::facet_grid(
     PC ~ window,
-    scales = "free_x"
+    scales = "free_x",
+    labeller = ggplot2::labeller(
+      window = ggplot2::label_parsed
+    )
   ) +
   ggplot2::scale_x_reverse() +
   ggplot2::labs(
-    title = "Adult-reference PCA loading profiles used for domain-level cross-cohort interpretation",
-    subtitle = "Harmonized windows; signs fixed to the stated clinical-pole convention; shaded intervals indicate pediatric D1-D5",
+    title = "Adult-reference PCA loading profiles",
+    subtitle = "Harmonized windows; fixed clinical-pole signs; D1-D5 shaded",
     x = expression(
       "Wavenumber (cm"^{-1}*")"
     ),
     y = "FactoMineR variable coordinate"
   ) +
-  theme_pub(
-    base_size = 9
-  )
+  theme_pub(base_size = 12)
 
 figS4_paths <- save_figure(
   pS4,
@@ -2502,23 +2482,22 @@ pS5 <- ggplot2::ggplot(
   ggplot2::facet_wrap(
     ~ dplyr::if_else(
       wavenumber > 2000,
-      "3400-2800 cm^-1",
-      "1800-870 cm^-1"
+      "3400*'–'*2800~cm^{-1}",
+      "1800*'–'*870~cm^{-1}"
     ),
     scales = "free_x",
-    ncol = 1
+    ncol = 1,
+    labeller = ggplot2::label_parsed
   ) +
   ggplot2::scale_x_reverse() +
   ggplot2::labs(
-    title = "Pointwise technical variability across four independent unused strips",
+    title = "Pointwise variability across unused strips",
     x = expression(
       "Wavenumber (cm"^{-1}*")"
     ),
     y = "Coefficient of variation (%)"
   ) +
-  theme_pub(
-    base_size = 9.5
-  )
+  theme_pub(base_size = 11.5)
 
 figS5_paths <- save_figure(
   pS5,

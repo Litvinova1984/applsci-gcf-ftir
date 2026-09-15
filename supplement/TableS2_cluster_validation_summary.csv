@@ -1,13 +1,7 @@
 section,metric,value_numeric,value_text
-Additional internal characterization (full SNV spectral space),Average silhouette in PC1-PC3 clustering space,0.43424880431781065,0.4342488043
-Additional internal characterization (full SNV spectral space),Average silhouette in full SNV spectral space,0.37543866471277776,0.3754386647
-Additional internal characterization (full SNV spectral space),PERMANOVA R2 in full SNV spectral space,0.5920095013217906,0.5920095013
-Additional internal characterization (full SNV spectral space),PERMANOVA pseudo-F in full SNV spectral space,15.961412179051573,15.9614121791
-Additional internal characterization (full SNV spectral space),PERMANOVA permutation p in full SNV spectral space,1e-4,0.0001000000
-Additional internal characterization (full SNV spectral space),Betadisper ANOVA F in full SNV spectral space,1.0738674753187747,1.0738674753
-Additional internal characterization (full SNV spectral space),Betadisper ANOVA p in full SNV spectral space,0.35892944341600663,0.3589294434
-Additional internal characterization (full SNV spectral space),Betadisper permutation F in full SNV spectral space,1.0738674753187747,1.0738674753
-Additional internal characterization (full SNV spectral space),Betadisper permutation p in full SNV spectral space,0.3602,0.3602000000
+Descriptive characterization (full SNV spectral space),Average silhouette in PC1-PC3 clustering space,0.43424880431781065,0.4342488043
+Descriptive characterization (full SNV spectral space),Average silhouette in full SNV spectral space,0.37543866471277776,0.3754386647
+Descriptive characterization (full SNV spectral space),PERMANOVA R² in full SNV spectral space,0.5920095013217906,0.5920095013
 Baseline,Retained PCs,3,3
 Baseline,Cumulative variance explained (%),89.28182549155741,89.28182549
 Baseline,Baseline k,3,3

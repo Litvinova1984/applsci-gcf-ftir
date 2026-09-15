@@ -17,9 +17,9 @@
 #   A. Sensitivity to the number of retained PCs
 #   B. Sensitivity to the number of clusters
 #   C. Baseline cluster-wise silhouette diagnostics
-#   C1. Additional internal characterization in the full
-#       SNV spectral space (full-space silhouette, PERMANOVA,
-#       and betadisper)
+#   C1. Additional full-SNV characterization (full-space silhouette,
+#       PERMANOVA, and betadisper; inferential outputs retained for
+#       auditability but not used as independent cluster validation)
 #   D. Leave-one-out stability
 #   E. Repeated 80% subsampling and pairwise consensus
 #   F. Participant-level bootstrap stability
@@ -1082,9 +1082,11 @@ readr::write_csv(
 #   - betadisper checks whether between-cluster separation could
 #     be accompanied by unequal within-cluster dispersion.
 #
-# Because cluster labels were derived from the same spectra,
-# PERMANOVA and betadisper are treated as internal
-# characterization, not as independent validation of the
+# Because cluster labels were derived from the same spectra, these
+# calculations are retained for auditability only. In the manuscript
+# and final Supplementary Table S2, PERMANOVA R2 is used only as a
+# descriptive separation measure; PERMANOVA F/p and betadisper
+# inferential outputs are not used as independent validation of the
 # existence or biological meaning of the clusters.
 #
 # The full-space and 3-PC silhouette values are not expected to
