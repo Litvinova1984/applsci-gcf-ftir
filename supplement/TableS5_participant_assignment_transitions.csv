@@ -1,0 +1,26 @@
+participant_id,sex,baseline_cluster,sex_residualized_cluster,clean_strip_residualized_cluster,changed_after_sex_residualization,changed_after_clean_strip_residualization,changed_in_either_sensitivity_analysis,changed_in_both_sensitivity_analyses,same_cluster_after_both_residualizations,transition_pattern
+1,F,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+10,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+11,M,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+12,M,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+13,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+14,F,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+15,F,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+16,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+17,F,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+18,M,2,2,2,FALSE,FALSE,FALSE,FALSE,TRUE,2 -> 2 -> 2
+19,M,3,2,3,TRUE,FALSE,TRUE,FALSE,FALSE,3 -> 2 -> 3
+2,M,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+20,M,2,2,2,FALSE,FALSE,FALSE,FALSE,TRUE,2 -> 2 -> 2
+21,M,3,3,3,FALSE,FALSE,FALSE,FALSE,TRUE,3 -> 3 -> 3
+22,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+23,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+24,M,2,2,2,FALSE,FALSE,FALSE,FALSE,TRUE,2 -> 2 -> 2
+25,M,3,2,3,TRUE,FALSE,TRUE,FALSE,FALSE,3 -> 2 -> 3
+3,M,3,3,3,FALSE,FALSE,FALSE,FALSE,TRUE,3 -> 3 -> 3
+4,F,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+5,M,3,3,3,FALSE,FALSE,FALSE,FALSE,TRUE,3 -> 3 -> 3
+6,M,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,1 -> 1 -> 1
+7,M,3,2,3,TRUE,FALSE,TRUE,FALSE,FALSE,3 -> 2 -> 3
+8,F,1,2,2,TRUE,TRUE,TRUE,TRUE,TRUE,1 -> 2 -> 2
+9,F,2,2,2,FALSE,FALSE,FALSE,FALSE,TRUE,2 -> 2 -> 2

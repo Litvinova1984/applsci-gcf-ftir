@@ -1,6 +1,6 @@
 ---
-title: "Applied Sciences Revision — Reproducibility Report"
-subtitle: "Pediatric GCF FTIR spectral phenotyping"
+title: "Applied Sciences Resubmission — Reproducibility Report"
+subtitle: "Exploratory pediatric GCF FTIR variation, partition stability, sex-associated variation, and clean-strip sensitivity"
 date: last-modified
 format:
   html:
@@ -30,6 +30,7 @@ project_root <- candidate_roots[
       dir.exists(file.path(x, "R")) &&
         dir.exists(file.path(x, "tables")) &&
         dir.exists(file.path(x, "figures")) &&
+        dir.exists(file.path(x, "supplement")) &&
         dir.exists(file.path(x, "data", "pediatric", "processed"))
     },
     logical(1)
@@ -39,14 +40,30 @@ project_root <- candidate_roots[
 if (length(project_root) == 0L || is.na(project_root)) {
   stop(
     "Could not locate the project root. Expected R/, tables/, figures/, ",
-    "and data/pediatric/processed/ either here or one level above."
+    "supplement/, and data/pediatric/processed/ either here or one level above."
   )
 }
 
 p <- function(...) file.path(project_root, ...)
 
+required_pkgs <- c("readr", "dplyr", "tidyr", "knitr")
+missing_pkgs <- required_pkgs[
+  !vapply(required_pkgs, requireNamespace, logical(1), quietly = TRUE)
+]
+
+if (length(missing_pkgs) > 0L) {
+  stop("Missing package(s): ", paste(missing_pkgs, collapse = ", "))
+}
+
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+  library(tidyr)
+  library(knitr)
+})
+
 require_file <- function(path) {
-  if (!file.exists(path)) stop("Required frozen output is missing: ", path)
+  if (!file.exists(path)) stop("Required file is missing: ", path)
   path
 }
 
@@ -54,27 +71,15 @@ read_csv_quiet <- function(path) {
   readr::read_csv(require_file(path), show_col_types = FALSE)
 }
 
-metric_value <- function(tbl, metric, section = NULL) {
-  z <- tbl
-  if (!is.null(section)) z <- z[z$section == section, , drop = FALSE]
-  z <- z[z$metric == metric, , drop = FALSE]
-  if (nrow(z) != 1L) {
-    stop("Expected one value for metric '", metric, "'; found ", nrow(z), ".")
-  }
-  as.numeric(z$value_numeric[[1]])
-}
-
 fmt <- function(x, digits = 3) {
-  formatC(x, digits = digits, format = "f")
+  formatC(as.numeric(x), digits = digits, format = "f")
 }
 
 fmt_p <- function(x) {
+  x <- as.numeric(x)
   if (!is.finite(x)) return("NA")
-  if (x < 0.001) {
-    format.pval(x, digits = 2, eps = 0.001)
-  } else {
-    formatC(x, digits = 3, format = "f")
-  }
+  if (x < 0.001) return(format.pval(x, digits = 2, eps = 0.001))
+  formatC(x, digits = 3, format = "f")
 }
 
 kable_clean <- function(x, digits = 3, caption = NULL) {
@@ -86,854 +91,716 @@ kable_clean <- function(x, digits = 3, caption = NULL) {
   )
 }
 
+metric_value <- function(tbl, metric) {
+  z <- tbl[tbl$metric == metric, "value", drop = TRUE]
+  if (length(z) != 1L) stop("Expected one value for metric: ", metric)
+  as.numeric(z[[1]])
+}
+
+# Core data objects produced by scripts 01-06.
+X_raw <- as.matrix(
+  readRDS(require_file(p("data", "pediatric", "processed", "pediatric_X_active_absorbance.rds")))
+)
 X_snv <- as.matrix(
-  readRDS(
-    require_file(
-      p("data", "pediatric", "processed", "pediatric_X_snv.rds")
-    )
-  )
+  readRDS(require_file(p("data", "pediatric", "processed", "pediatric_X_snv.rds")))
 )
-
+wavenumbers <- as.numeric(
+  readRDS(require_file(p("data", "pediatric", "processed", "pediatric_wavenumbers.rds")))
+)
+pca_baseline <- readRDS(
+  require_file(p("data", "pediatric", "processed", "pediatric_PCA_baseline_3PC.rds"))
+)
 clusters_raw <- readRDS(
-  require_file(
-    p("data", "pediatric", "processed", "pediatric_clusters_baseline.rds")
-  )
+  require_file(p("data", "pediatric", "processed", "pediatric_clusters_baseline.rds"))
 )
-
 robustness <- readRDS(
-  require_file(
-    p("data", "pediatric", "processed", "cluster_robustness_objects.rds")
-  )
+  require_file(p("data", "pediatric", "processed", "cluster_robustness_objects.rds"))
 )
-
 sex_obj <- readRDS(
-  require_file(
-    p("data", "pediatric", "processed", "sex_sensitivity_objects.rds")
-  )
+  require_file(p("data", "pediatric", "processed", "sex_sensitivity_objects.rds"))
 )
-
 strip_obj <- readRDS(
-  require_file(
-    p("data", "pediatric", "processed", "strip_reproducibility_objects.rds")
-  )
+  require_file(p("data", "pediatric", "processed", "strip_reproducibility_objects.rds"))
+)
+transition_obj <- readRDS(
+  require_file(p("data", "pediatric", "processed", "assignment_transition_objects.rds"))
 )
 
-domain_obj <- readRDS(
-  require_file(
-    p("data", "pediatric", "processed", "spectral_domain_objects.rds")
-  )
-)
+# Publication outputs produced by script 07.
+Table1 <- read_csv_quiet(p("tables", "Table1_pediatric_cohort_characteristics.csv"))
+Table2 <- read_csv_quiet(p("tables", "Table2_exploratory_partition_stability.csv"))
+Table3 <- read_csv_quiet(p("tables", "Table3_sex_and_substrate_sensitivity.csv"))
+manifest <- read_csv_quiet(p("tables", "07_output_manifest.csv"))
 
-adult_obj <- readRDS(
-  require_file(
-    p("data", "adult", "processed", "adult_reference_analysis_objects.rds")
-  )
-)
+S1 <- read_csv_quiet(p("supplement", "TableS1_cluster_stability_detailed.csv"))
+S2 <- read_csv_quiet(p("supplement", "TableS2_PC1_PC3_sex_associations_BH.csv"))
+S3 <- read_csv_quiet(p("supplement", "TableS3_clean_strip_technical_reproducibility.csv"))
+S4 <- read_csv_quiet(p("supplement", "TableS4_clean_strip_direction_sensitivity.csv"))
+S5 <- read_csv_quiet(p("supplement", "TableS5_participant_assignment_transitions.csv"))
+S6 <- read_csv_quiet(p("supplement", "TableS6_pairwise_partition_agreement.csv"))
+S7 <- read_csv_quiet(p("supplement", "TableS7_PCA_eigenvector_loadings_PC1_PC3.csv"))
 
-robustness_summary <- read_csv_quiet(
-  p("tables", "cluster_robustness_summary.csv")
-)
-
-sex_summary <- read_csv_quiet(
-  p("tables", "sex_sensitivity_summary.csv")
-)
-
-table1 <- read_csv_quiet(
-  p("tables", "Table1_pediatric_cohort_characteristics.csv")
-)
-
-output_manifest <- read_csv_quiet(
-  p("tables", "08_output_manifest.csv")
-)
-
-clusters <- clusters_raw
-if (is.factor(clusters)) {
-  clusters <- as.integer(as.character(clusters))
+clusters <- if (is.factor(clusters_raw)) {
+  as.integer(as.character(clusters_raw))
 } else {
-  clusters <- as.integer(clusters)
+  as.integer(clusters_raw)
 }
+names(clusters) <- names(clusters_raw)
 
-n_pediatric <- nrow(X_snv)
-n_variables <- ncol(X_snv)
+if (!identical(dim(X_raw), c(25L, 793L))) stop("Unexpected raw matrix dimensions.")
+if (!identical(dim(X_snv), c(25L, 793L))) stop("Unexpected SNV matrix dimensions.")
+if (length(wavenumbers) != 793L) stop("Unexpected wavenumber count.")
+if (nrow(S5) != 25L) stop("Unexpected participant-transition row count.")
+if (nrow(S7) != 793L) stop("Unexpected loading-table row count.")
+if (!all(as.logical(manifest$exists))) stop("The publication manifest contains missing files.")
 
-cluster_sizes <- as.integer(
-  table(factor(clusters, levels = 1:3))
-)
+pca_eig <- as.data.frame(pca_baseline$eig)
+pc1_variance <- pca_eig[1, 2]
+pc2_variance <- pca_eig[2, 2]
+pc3_variance <- pca_eig[3, 2]
+cumulative_3pc <- pca_eig[3, 3]
+cluster_sizes <- as.integer(table(factor(clusters, levels = 1:3)))
+baseline_silhouette <- mean(robustness$baseline_silhouette_by_participant$silhouette_width)
 
-baseline_pc <- metric_value(
-  robustness_summary,
-  "Retained PCs",
-  "Baseline"
-)
+pc1_row <- sex_obj$pc_sex_results |>
+  dplyr::filter(PC == "PC1")
 
-baseline_variance <- metric_value(
-  robustness_summary,
-  "Cumulative variance explained (%)",
-  "Baseline"
-)
+sex_res <- sex_obj$sex_residualized_summary
+strip_technical <- strip_obj$technical_summary
+strip_primary <- strip_obj$primary_sensitivity_summary
+pairwise_partitions <- transition_obj$pairwise_partition_summary
+participant_changes <- transition_obj$participant_change_summary
 
-baseline_sil <- metric_value(
-  robustness_summary,
-  "Average silhouette",
-  "Baseline"
-)
+strip_min_pearson <- metric_value(strip_technical, "Minimum pairwise Pearson")
+strip_min_spearman <- metric_value(strip_technical, "Minimum pairwise Spearman")
+strip_integrated_cv <- metric_value(strip_technical, "Integrated absorbance CV (%)")
+strip_median_cv <- metric_value(strip_technical, "Median pointwise CV (%)")
+strip_p95_cv <- metric_value(strip_technical, "95th percentile pointwise CV (%)")
+strip_resid_ari <- metric_value(strip_primary, "ARI vs baseline")
+strip_changed_n <- metric_value(strip_primary, "Participants changing aligned assignment")
+strip_resid_silhouette <- metric_value(strip_primary, "Average silhouette")
 
-loo_mean <- metric_value(
-  robustness_summary,
-  "Mean ARI",
-  "Leave-one-out"
-)
-
-loo_median <- metric_value(
-  robustness_summary,
-  "Median ARI",
-  "Leave-one-out"
-)
-
-loo_exact <- metric_value(
-  robustness_summary,
-  "Exact recovery proportion",
-  "Leave-one-out"
-)
-
-sub_mean <- metric_value(
-  robustness_summary,
-  "Mean ARI",
-  "80% subsampling"
-)
-
-sub_median <- metric_value(
-  robustness_summary,
-  "Median ARI",
-  "80% subsampling"
-)
-
-sub_exact <- metric_value(
-  robustness_summary,
-  "Exact recovery proportion",
-  "80% subsampling"
-)
-
-boot_mean <- metric_value(
-  robustness_summary,
-  "Mean ARI",
-  "Bootstrap"
-)
-
-boot_median <- metric_value(
-  robustness_summary,
-  "Median ARI",
-  "Bootstrap"
-)
-
-consensus_within <- metric_value(
-  robustness_summary,
-  "Within-cluster mean consensus",
-  "Pairwise consensus"
-)
-
-consensus_between <- metric_value(
-  robustness_summary,
-  "Between-cluster mean consensus",
-  "Pairwise consensus"
-)
-
-sex_cluster_p <- metric_value(
-  sex_summary,
-  "Sex x cluster Fisher p",
-  "Clinical metadata associations"
-)
-
-sex_cluster_v <- metric_value(
-  sex_summary,
-  "Sex x cluster Cramer's V",
-  "Clinical metadata associations"
-)
-
-pc1_sex_p <- metric_value(
-  sex_summary,
-  "Wilcoxon p",
-  "PC1 sex association"
-)
-
-pc1_g <- metric_value(
-  sex_summary,
-  "Hedges g F minus M",
-  "PC1 sex association"
-)
-
-pc1_g_l <- metric_value(
-  sex_summary,
-  "Hedges g 95% CI lower",
-  "PC1 sex association"
-)
-
-pc1_g_u <- metric_value(
-  sex_summary,
-  "Hedges g 95% CI upper",
-  "PC1 sex association"
-)
-
-sex_resid_ari <- metric_value(
-  sex_summary,
-  "ARI vs baseline",
-  "Sex-residualized sensitivity"
-)
-
-sex_resid_p <- metric_value(
-  sex_summary,
-  "Sex x residualized cluster Fisher p",
-  "Sex-residualized sensitivity"
-)
-
-sex_resid_v <- metric_value(
-  sex_summary,
-  "Sex x residualized cluster Cramer's V",
-  "Sex-residualized sensitivity"
-)
-
-sex_resid_v_l <- metric_value(
-  sex_summary,
-  "Sex x residualized cluster Cramer's V CI lower",
-  "Sex-residualized sensitivity"
-)
-
-sex_resid_v_u <- metric_value(
-  sex_summary,
-  "Sex x residualized cluster Cramer's V CI upper",
-  "Sex-residualized sensitivity"
-)
-
-strip_metric <- function(name) {
-  z <- strip_obj$technical_summary
-  as.numeric(z$value[z$metric == name][1])
-}
-
-strip_min_pearson <- strip_metric("Minimum pairwise Pearson")
-strip_min_spearman <- strip_metric("Minimum pairwise Spearman")
-strip_integrated_cv <- strip_metric("Integrated absorbance CV (%)")
-strip_median_cv <- strip_metric("Median pointwise CV (%)")
-strip_p95_cv <- strip_metric("95th percentile pointwise CV (%)")
-strip_resid_ari <- strip_obj$ARI_strip_resid
-no_d1_ari <- strip_obj$ARI_no_D1
-selected_axis_matches <- adult_obj$axis_matching$selected_matches
-adult_domain_map <- adult_obj$adult_domain_clinical_mapping
-
-stopifnot(
-  identical(dim(X_snv), c(25L, 793L)),
-  identical(cluster_sizes, c(15L, 4L, 6L)),
-  abs(baseline_variance - 89.282) < 0.05,
-  adult_obj$settings$n_reference_spectra == 18L,
-  adult_obj$settings$retained_variables == 793L
-)
-```
-
-# 1. Reproducibility overview
-
-This report is the final computational audit for the revised *Applied Sciences* manuscript. It reads the frozen outputs produced by scripts `01`--`08`; it does not introduce a new model-selection path or a new inferential branch.
-
-The active pediatric matrix contains **`r n_pediatric` spectra × `r n_variables` spectral variables**. The baseline analysis retained **`r baseline_pc` PCs**, explaining **`r fmt(baseline_variance, 2)`%** of total spectral variance, and produced three clusters of **`r paste(cluster_sizes, collapse = " / ")`** participants.
-
-```{r}
-#| label: workflow
-#| echo: false
-#| fig-cap: "Final analytical workflow used in the revision."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure1_analytical_workflow.png"))
-)
-```
-
-## Final output manifest
-
-```{r}
-#| label: output-manifest
-
-kable_clean(
-  output_manifest,
-  caption = "Files generated by R/08_tables_figures.R"
-)
-```
-
-# 2. Pediatric preprocessing
-
-The public pediatric workflow uses the analytical windows **3400--2800 cm^-1** and **1800--870 cm^-1**, followed by row-wise standard normal variate (SNV) normalization. The processed matrix used throughout the baseline analyses has dimensions **`r n_pediatric` × `r n_variables`**.
-
-```{r}
-#| label: snv-checks
-
-snv_check <- data.frame(
-  check = c(
-    "Spectra",
-    "Spectral variables",
-    "Maximum absolute row mean after SNV",
-    "Maximum absolute row SD minus 1"
-  ),
-  value = c(
-    nrow(X_snv),
-    ncol(X_snv),
-    max(abs(rowMeans(X_snv))),
-    max(abs(apply(X_snv, 1, stats::sd) - 1))
-  )
-)
-
-kable_clean(snv_check, digits = 8)
-```
-
-# 3. Baseline PCA and three-cluster solution
-
-Three PCs were retained on the basis of the scree/cumulative-variance criterion and used as the clustering representation. They explain **`r fmt(baseline_variance, 2)`%** of pediatric spectral variance.
-
-Hierarchical clustering was performed in the three-dimensional PCA score space using Euclidean distance and Ward.D2 linkage. The baseline partition contains **`r paste(cluster_sizes, collapse = " / ")`** participants.
-
-```{r}
-#| label: baseline-figure
-#| echo: false
-#| fig-cap: "Baseline PCA, cluster-number evaluation, PCA-dimensionality sensitivity, and silhouette diagnostics."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure2_PCA_cluster_validation.png"))
-)
-```
-
-## Baseline summary
-
-```{r}
-#| label: baseline-summary
-
-baseline_rows <- robustness_summary[
-  robustness_summary$section == "Baseline",
-  c("metric", "value_text")
+sex_strip_ari <- pairwise_partitions$ARI[
+  pairwise_partitions$comparison == "Sex-residualized vs Clean-strip-residualized"
 ]
 
-names(baseline_rows) <- c("Metric", "Value")
+change_lookup <- function(metric) {
+  z <- participant_changes$value[participant_changes$metric == metric]
+  if (length(z) != 1L) stop("Expected one participant-change value for: ", metric)
+  as.integer(z[[1]])
+}
 
-kable_clean(baseline_rows)
+n_change_sex <- change_lookup("Participants changing after sex residualization")
+n_change_strip <- change_lookup("Participants changing after clean-strip residualization")
+n_change_either <- change_lookup("Participants changing in either sensitivity analysis")
+n_change_both <- change_lookup("Participants changing in both sensitivity analyses")
+
+key_numbers <- dplyr::bind_rows(
+  tibble::tibble(
+    section = "Data",
+    metric = c("Participants", "Spectral variables"),
+    value_numeric = c(nrow(X_snv), ncol(X_snv)),
+    value_text = c(as.character(nrow(X_snv)), as.character(ncol(X_snv)))
+  ),
+  tibble::tibble(
+    section = "Baseline PCA",
+    metric = c(
+      "PC1 variance (%)",
+      "PC2 variance (%)",
+      "PC3 variance (%)",
+      "Cumulative variance PC1-PC3 (%)",
+      "Average silhouette"
+    ),
+    value_numeric = c(
+      pc1_variance,
+      pc2_variance,
+      pc3_variance,
+      cumulative_3pc,
+      baseline_silhouette
+    ),
+    value_text = c(
+      fmt(pc1_variance, 3),
+      fmt(pc2_variance, 3),
+      fmt(pc3_variance, 3),
+      fmt(cumulative_3pc, 3),
+      fmt(baseline_silhouette, 3)
+    )
+  ),
+  tibble::tibble(
+    section = "Baseline partition",
+    metric = c("Group 1 n", "Group 2 n", "Group 3 n"),
+    value_numeric = cluster_sizes,
+    value_text = as.character(cluster_sizes)
+  ),
+  tibble::tibble(
+    section = "Stability",
+    metric = c(
+      "Leave-one-out mean ARI",
+      "Leave-one-out median ARI",
+      "Leave-one-out exact recovery proportion",
+      "80% subsampling mean ARI",
+      "80% subsampling median ARI",
+      "Within-group mean consensus",
+      "Between-group mean consensus",
+      "Bootstrap mean ARI",
+      "Bootstrap median ARI"
+    ),
+    value_numeric = c(
+      robustness$loo_summary$mean_ARI,
+      robustness$loo_summary$median_ARI,
+      robustness$loo_summary$proportion_ARI_1,
+      robustness$subsampling_summary$mean_ARI,
+      robustness$subsampling_summary$median_ARI,
+      robustness$consensus_summary$mean_consensus[
+        robustness$consensus_summary$baseline_same_cluster
+      ],
+      robustness$consensus_summary$mean_consensus[
+        !robustness$consensus_summary$baseline_same_cluster
+      ],
+      robustness$bootstrap_summary$mean_ARI,
+      robustness$bootstrap_summary$median_ARI
+    ),
+    value_text = fmt(c(
+      robustness$loo_summary$mean_ARI,
+      robustness$loo_summary$median_ARI,
+      robustness$loo_summary$proportion_ARI_1,
+      robustness$subsampling_summary$mean_ARI,
+      robustness$subsampling_summary$median_ARI,
+      robustness$consensus_summary$mean_consensus[
+        robustness$consensus_summary$baseline_same_cluster
+      ],
+      robustness$consensus_summary$mean_consensus[
+        !robustness$consensus_summary$baseline_same_cluster
+      ],
+      robustness$bootstrap_summary$mean_ARI,
+      robustness$bootstrap_summary$median_ARI
+    ), 3)
+  ),
+  tibble::tibble(
+    section = "Sex-associated variation",
+    metric = c(
+      "Sex-partition Fisher p",
+      "Sex-partition Cramer's V",
+      "PC1 raw p",
+      "PC1 BH-adjusted p",
+      "PC1 rank-biserial correlation",
+      "PC1 Hedges g",
+      "Sex-residualized ARI vs baseline",
+      "Sex-residualized average silhouette",
+      "Participants changing after sex residualization"
+    ),
+    value_numeric = c(
+      sex_obj$sex_cluster_association$fisher_p_value,
+      sex_obj$sex_cluster_association$cramers_v,
+      pc1_row$p_value_raw,
+      pc1_row$p_value_BH,
+      pc1_row$rank_biserial_F_vs_M,
+      pc1_row$hedges_g_F_minus_M,
+      sex_res$ARI_vs_baseline,
+      sex_res$residualized_average_silhouette,
+      sex_res$participants_changing_aligned_assignment
+    ),
+    value_text = c(
+      fmt_p(sex_obj$sex_cluster_association$fisher_p_value),
+      fmt(sex_obj$sex_cluster_association$cramers_v, 3),
+      fmt_p(pc1_row$p_value_raw),
+      fmt_p(pc1_row$p_value_BH),
+      fmt(pc1_row$rank_biserial_F_vs_M, 3),
+      fmt(pc1_row$hedges_g_F_minus_M, 3),
+      fmt(sex_res$ARI_vs_baseline, 3),
+      fmt(sex_res$residualized_average_silhouette, 3),
+      as.character(sex_res$participants_changing_aligned_assignment)
+    )
+  ),
+  tibble::tibble(
+    section = "Clean-strip analysis",
+    metric = c(
+      "Minimum pairwise Pearson r",
+      "Minimum pairwise Spearman rho",
+      "Integrated absorbance CV (%)",
+      "Median pointwise CV (%)",
+      "95th percentile pointwise CV (%)",
+      "Residualized ARI vs baseline",
+      "Residualized average silhouette",
+      "Participants changing after residualization"
+    ),
+    value_numeric = c(
+      strip_min_pearson,
+      strip_min_spearman,
+      strip_integrated_cv,
+      strip_median_cv,
+      strip_p95_cv,
+      strip_resid_ari,
+      strip_resid_silhouette,
+      strip_changed_n
+    ),
+    value_text = c(
+      fmt(strip_min_pearson, 6),
+      fmt(strip_min_spearman, 6),
+      fmt(strip_integrated_cv, 3),
+      fmt(strip_median_cv, 3),
+      fmt(strip_p95_cv, 3),
+      fmt(strip_resid_ari, 3),
+      fmt(strip_resid_silhouette, 3),
+      as.character(as.integer(round(strip_changed_n)))
+    )
+  ),
+  tibble::tibble(
+    section = "Partition comparison",
+    metric = c(
+      "ARI: sex-residualized vs clean-strip-residualized",
+      "Participants changing in either sensitivity analysis",
+      "Participants changing in both sensitivity analyses"
+    ),
+    value_numeric = c(sex_strip_ari, n_change_either, n_change_both),
+    value_text = c(fmt(sex_strip_ari, 3), as.character(n_change_either), as.character(n_change_both))
+  )
+)
+
+readr::write_csv(
+  key_numbers,
+  p("tables", "08_reproducibility_report_key_numbers.csv")
+)
+
+scope_checks <- tibble::tibble(
+  check = c(
+    "Pediatric active spectra",
+    "Spectral-variable count",
+    "Participant transition rows",
+    "Continuous loading rows",
+    "Publication manifest rows",
+    "All manifest paths exist"
+  ),
+  expected = c("25", "793", "25", "793", "30", "TRUE"),
+  observed = c(
+    as.character(nrow(X_snv)),
+    as.character(ncol(X_snv)),
+    as.character(nrow(S5)),
+    as.character(nrow(S7)),
+    as.character(nrow(manifest)),
+    as.character(all(as.logical(manifest$exists)))
+  ),
+  passed = expected == observed
+)
+
+if (!all(scope_checks$passed)) stop("One or more report scope checks failed.")
+
+readr::write_csv(
+  scope_checks,
+  p("tables", "08_reproducibility_report_scope_checks.csv")
+)
+
+main_figure_files <- file.path(
+  "figures",
+  c(
+    "Figure1_analytical_workflow.png",
+    "Figure2_spectral_structure_and_PCA_profiles.png",
+    "Figure3_partition_selection_and_stability.png",
+    "Figure4_sex_associated_variation.png",
+    "Figure5_clean_strip_reproducibility_and_sensitivity.png",
+    "Figure6_partition_assignment_transitions.png"
+  )
+)
+
+supp_figure_files <- file.path(
+  "figures",
+  c(
+    "FigureS1_consensus_heatmap.png",
+    "FigureS2_bootstrap_group_Jaccard.png",
+    "FigureS3_descriptive_group_spectra.png",
+    "FigureS4_clean_strip_direction_invariance.png"
+  )
+)
+
+invisible(lapply(c(main_figure_files, supp_figure_files), function(x) require_file(p(x))))
 ```
 
-# 4. Cluster-number internal evaluation
+# 1. Scope and computational contract
 
-Internal indices were evaluated for **k = 2--6** in the baseline three-PC space.
+This report documents the complete pediatric-only computational chain used for the reframed manuscript. It consumes the frozen outputs of scripts `01` through `07`; it does not fit an additional model, select a new partition, or introduce a new inferential branch.
+
+The active matrix contains **`r nrow(X_snv)` participant-level spectra** and **`r ncol(X_snv)` retained spectral variables**. The report verifies the publication tables, figures, supplementary exports, and participant-level transition records generated by the analytical workflow.
 
 ```{r}
-#| label: k-internal-evaluation
+#| label: report-scope-checks
+#| echo: false
 
 kable_clean(
-  robustness$k_results,
-  digits = 4,
-  caption = "Internal clustering indices for k = 2-6."
+  scope_checks,
+  caption = "Automated scope and completeness checks performed before report rendering."
 )
 ```
 
-For the focal k = 2 versus k = 3 comparison, the average silhouette changes only from **`r fmt(metric_value(robustness_summary, "Silhouette k=2", "k = 3 versus k = 2"), 3)`** to **`r fmt(metric_value(robustness_summary, "Silhouette k=3", "k = 3 versus k = 2"), 3)`**, while the Calinski--Harabasz index increases and the Davies--Bouldin index decreases. Higher-k solutions progressively fragment the small pilot sample; k = 6 contains a singleton cluster. Accordingly, k = 3 is retained as the parsimonious interpretable solution rather than claimed to be uniquely optimal.
+```{r}
+#| label: workflow-figure
+#| echo: false
+#| fig-cap: "Pediatric-only exploratory analytical workflow."
 
-# 5. Sensitivity to the number of retained PCs
+knitr::include_graphics(require_file(p(main_figure_files[[1]])))
+```
+
+# 2. Data and preprocessing
+
+The analysis uses the spectral windows **3400–2800 cm^-1^** and **1800–870 cm^-1^**. Three technical acquisitions were averaged before participant-level analysis. Row-wise standard normal variate normalization was applied, with no additional feature-wise scaling.
 
 ```{r}
-#| label: pc-sensitivity
+#| label: cohort-table
+#| echo: false
+
+kable_clean(
+  Table1,
+  caption = "Pediatric cohort characteristics used in the active analysis."
+)
+```
+
+```{r}
+#| label: preprocessing-checks
+
+preprocessing_checks <- tibble::tibble(
+  Check = c(
+    "Raw matrix dimensions",
+    "SNV matrix dimensions",
+    "Maximum absolute SNV row mean",
+    "Maximum absolute SNV row SD minus 1",
+    "Wavenumber count"
+  ),
+  Value = c(
+    paste(dim(X_raw), collapse = " x "),
+    paste(dim(X_snv), collapse = " x "),
+    format(max(abs(rowMeans(X_snv))), scientific = TRUE, digits = 4),
+    format(max(abs(apply(X_snv, 1, stats::sd) - 1)), scientific = TRUE, digits = 4),
+    as.character(length(wavenumbers))
+  )
+)
+
+kable_clean(preprocessing_checks)
+```
+
+# 3. Spectral structure and baseline exploratory partition
+
+PC1, PC2, and PC3 explain **`r fmt(pc1_variance, 2)`%**, **`r fmt(pc2_variance, 2)`%**, and **`r fmt(pc3_variance, 2)`%** of total spectral variance, respectively. Together they explain **`r fmt(cumulative_3pc, 2)`%**. The fixed three-PC representation yields exploratory groups of **`r paste(cluster_sizes, collapse = "/")`** participants.
+
+The loading profiles retain the raw mathematical signs produced by PCA. No post hoc sign orientation is applied.
+
+```{r}
+#| label: spectral-structure-figure
+#| echo: false
+#| fig-cap: "Participant spectra, exploratory PCA score representation, and continuous PC1–PC3 eigenvector loading profiles."
+
+knitr::include_graphics(require_file(p(main_figure_files[[2]])))
+```
+
+```{r}
+#| label: baseline-summary-table
+#| echo: false
+
+baseline_summary <- tibble::tibble(
+  Metric = c(
+    "PC1 variance (%)",
+    "PC2 variance (%)",
+    "PC3 variance (%)",
+    "Cumulative PC1-PC3 variance (%)",
+    "Exploratory group sizes",
+    "Average silhouette"
+  ),
+  Value = c(
+    fmt(pc1_variance, 3),
+    fmt(pc2_variance, 3),
+    fmt(pc3_variance, 3),
+    fmt(cumulative_3pc, 3),
+    paste(cluster_sizes, collapse = "/"),
+    fmt(baseline_silhouette, 3)
+  )
+)
+
+kable_clean(baseline_summary)
+```
+
+## Continuous loading export
+
+The full **793 × 3** loading matrix is exported as `supplement/TableS7_PCA_eigenvector_loadings_PC1_PC3.csv`. The table below lists the eight largest absolute loading coefficients on each component solely as a compact numerical audit of the continuous profiles.
+
+```{r}
+#| label: top-loading-audit
+
+loading_top <- S7 |>
+  tidyr::pivot_longer(
+    cols = c(PC1, PC2, PC3),
+    names_to = "PC",
+    values_to = "loading"
+  ) |>
+  dplyr::mutate(abs_loading = abs(loading)) |>
+  dplyr::group_by(PC) |>
+  dplyr::slice_max(abs_loading, n = 8, with_ties = FALSE) |>
+  dplyr::arrange(PC, dplyr::desc(abs_loading)) |>
+  dplyr::ungroup() |>
+  dplyr::select(PC, wavenumber, loading, abs_loading)
+
+kable_clean(
+  loading_top,
+  digits = 6,
+  caption = "Largest absolute loading coefficients for numerical verification only."
+)
+```
+
+# 4. Partition selection and internal stability
+
+The three-group solution is retained as a parsimonious descriptive representation rather than a uniquely established classification. Internal indices were evaluated for **k = 2–6**, and sensitivity to the retained PCA dimensionality was assessed for **2–7 components**.
+
+```{r}
+#| label: stability-figure
+#| echo: false
+#| fig-cap: "Candidate group counts, PCA-dimensionality sensitivity, leave-one-out stability, repeated subsampling, and participant bootstrap."
+
+knitr::include_graphics(require_file(p(main_figure_files[[3]])))
+```
+
+```{r}
+#| label: main-stability-table
+#| echo: false
+
+kable_clean(
+  Table2,
+  caption = "Summary of the exploratory partition and its internal stability."
+)
+```
+
+## Sensitivity to retained PCA dimensionality
+
+```{r}
+#| label: pc-count-sensitivity
 
 kable_clean(
   robustness$pc_results,
   digits = 4,
-  caption = "Sensitivity of the k = 3 partition to retaining 2-7 PCs."
+  caption = "Agreement of three-group solutions obtained with 2–7 retained principal components."
 )
 ```
 
-The baseline partition is reproduced exactly for **2, 3, 5, and 6 PCs (ARI = 1)**; the 4- and 7-PC solutions yield the same alternative partition.
+## Leave-one-out, repeated subsampling, and participant bootstrap
 
-# 6. Baseline silhouette and full-space internal characterization
+Across the 25 leave-one-out runs, mean ARI is **`r fmt(robustness$loo_summary$mean_ARI, 3)`**, median ARI is **`r fmt(robustness$loo_summary$median_ARI, 3)`**, and exact recovery occurs in **`r fmt(100 * robustness$loo_summary$proportion_ARI_1, 1)`%** of runs.
 
-The primary average silhouette in the actual clustering space is **`r fmt(baseline_sil, 3)`**. All 25 participants have positive silhouette widths in the baseline three-PC space.
+Across 1,000 repeated 80% subsamples, mean ARI is **`r fmt(robustness$subsampling_summary$mean_ARI, 3)`** and median ARI is **`r fmt(robustness$subsampling_summary$median_ARI, 3)`**. Mean pairwise consensus is **`r fmt(robustness$consensus_summary$mean_consensus[robustness$consensus_summary$baseline_same_cluster], 3)`** within baseline groups and **`r fmt(robustness$consensus_summary$mean_consensus[!robustness$consensus_summary$baseline_same_cluster], 3)`** between baseline groups.
 
-```{r}
-#| label: cluster-silhouette
-
-kable_clean(
-  robustness$baseline_silhouette_by_cluster,
-  digits = 4,
-  caption = "Cluster-specific silhouette diagnostics in the baseline three-PC clustering space."
-)
-```
-
-The full-SNV-space metrics are retained only as descriptive internal characterization and are not treated as independent inferential validation.
+Across 1,000 participant-bootstrap iterations, mean ARI is **`r fmt(robustness$bootstrap_summary$mean_ARI, 3)`**. Group-specific mean Jaccard similarities are **`r paste(fmt(robustness$bootstrap_jaccard_summary$mean_Jaccard, 3), collapse = ", ")`** for Groups 1–3.
 
 ```{r}
-#| label: full-snv-characterization
+#| label: resampling-summary
 
-full_snv_descriptive <- robustness$baseline_internal_characterization |>
-  dplyr::filter(
-    metric %in% c(
-      "Average silhouette in PC1-PC3 clustering space",
-      "Average silhouette in full SNV spectral space",
-      "PERMANOVA R2 in full SNV spectral space"
-    )
-  ) |>
-  dplyr::mutate(
-    section = "Descriptive characterization (full SNV spectral space)",
-    metric = dplyr::if_else(
-      metric == "PERMANOVA R2 in full SNV spectral space",
-      "PERMANOVA R² in full SNV spectral space",
-      metric
-    )
-  )
-
-kable_clean(
-  full_snv_descriptive,
-  digits = 4,
-  caption = "Descriptive characterization in the full SNV spectral space."
-)
-```
-
-# 7. Leave-one-out stability
-
-Across 25 leave-one-out runs, mean ARI is **`r fmt(loo_mean, 3)`**, median ARI is **`r fmt(loo_median, 3)`**, and exact recovery occurs in **`r fmt(100 * loo_exact, 1)`%** of runs.
-
-```{r}
-#| label: loo-summary
-
-kable_clean(
-  robustness$loo_summary,
-  digits = 4
-)
-```
-
-# 8. Repeated 80% subsampling and consensus
-
-Across 1000 repeated 80% subsamples, mean ARI is **`r fmt(sub_mean, 3)`**, median ARI is **`r fmt(sub_median, 3)`**, and exact recovery occurs in **`r fmt(100 * sub_exact, 1)`%** of runs.
-
-Pairwise consensus is substantially stronger within baseline clusters than between baseline clusters: mean **`r fmt(consensus_within, 3)`** versus **`r fmt(consensus_between, 3)`**, respectively.
-
-```{r}
-#| label: subsampling-summary
-
-kable_clean(
-  robustness$subsampling_summary,
-  digits = 4
-)
-
-kable_clean(
-  robustness$consensus_summary,
-  digits = 4,
-  caption = "Pairwise consensus within and between baseline clusters."
-)
-```
-
-```{r}
-#| label: consensus-heatmap
-#| echo: false
-#| fig-cap: "Repeated-subsampling consensus matrix."
-
-knitr::include_graphics(
-  require_file(p("figures", "FigureS1_consensus_heatmap.png"))
-)
-```
-
-# 9. Participant-level bootstrap
-
-Across 1000 participant-level bootstrap samples, mean ARI is **`r fmt(boot_mean, 3)`** and median ARI is **`r fmt(boot_median, 3)`**. Cluster-specific Jaccard stability is strongest for Clusters 1 and 3 and lower for the small four-participant Cluster 2.
-
-```{r}
-#| label: bootstrap-summary
-
-kable_clean(
-  robustness$bootstrap_summary,
-  digits = 4
-)
-
-kable_clean(
-  robustness$bootstrap_jaccard_summary,
-  digits = 4,
-  caption = "Cluster-specific bootstrap Jaccard stability."
-)
-```
-
-# 10. Clinical metadata
-
-The individual anonymized metadata used in the revised analysis are reproduced below.
-
-```{r}
-#| label: table1
-
-kable_clean(
-  table1,
-  caption = "Table 1. Characteristics of the pediatric GCF cohort included in the FTIR analysis."
-)
-```
-
-```{r}
-#| label: clinical-figure
-#| echo: false
-#| fig-cap: "Clinical composition of the three pediatric GCF spectral clusters."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure3_clinical_composition.png"))
-)
-```
-
-## Original metadata associations
-
-```{r}
-#| label: original-clinical-tests
-
-clinical_rows <- sex_summary[
-  sex_summary$section == "Clinical metadata associations",
-  c("metric", "value_numeric")
-]
-
-names(clinical_rows) <- c("Metric", "Value")
-
-kable_clean(clinical_rows, digits = 4)
-```
-
-Sex is associated with baseline cluster membership (**Fisher p = `r fmt_p(sex_cluster_p)`; Cramer's V = `r fmt(sex_cluster_v, 3)`**). The exact reproduced endocrine-status Fisher p value is taken from the revised computational workflow rather than copied from the submitted rounded value.
-
-# 11. Sex sensitivity
-
-PC1 differs between female and male participants (**Wilcoxon p = `r fmt_p(pc1_sex_p)`; Hedges' g = `r fmt(pc1_g, 2)`, 95% CI `r fmt(pc1_g_l, 2)` to `r fmt(pc1_g_u, 2)`**).
-
-After feature-wise removal of sex-associated variation from the SNV-normalized spectra, PCA and Ward.D2 clustering were repeated. The resulting partition differs substantially from baseline (**ARI = `r fmt(sex_resid_ari, 3)`**). The sex-by-cluster association is no longer statistically significant (**Fisher p = `r fmt_p(sex_resid_p)`**), while the residual Cramer's V is **`r fmt(sex_resid_v, 3)`** with a wide 95% CI of **`r fmt(sex_resid_v_l, 3)`--`r fmt(sex_resid_v_u, 3)`**.
-
-This sensitivity analysis indicates that sex-associated spectral variation contributes materially to the baseline cluster organization. It is not treated as a corrected replacement partition and does not establish that the biological cluster structure is reducible to sex.
-
-```{r}
-#| label: sex-summary-table
-
-sex_rows <- sex_summary[
-  sex_summary$section %in% c(
-    "PC1 sex association",
-    "Sex-residualized sensitivity"
+resampling_summary <- dplyr::bind_rows(
+  tibble::tibble(
+    Procedure = "Leave-one-out",
+    Mean_ARI = robustness$loo_summary$mean_ARI,
+    Median_ARI = robustness$loo_summary$median_ARI,
+    Exact_recovery_percent = 100 * robustness$loo_summary$proportion_ARI_1
   ),
-  c("section", "metric", "value_numeric")
-]
-
-names(sex_rows) <- c("Section", "Metric", "Value")
-
-kable_clean(sex_rows, digits = 4)
-```
-
-```{r}
-#| label: sex-residualized-figure
-#| echo: false
-#| fig-cap: "Baseline and sex-residualized PCA sensitivity."
-
-knitr::include_graphics(
-  require_file(p("figures", "FigureS2_sex_residualized_PCA_sensitivity.png"))
-)
-```
-
-# 12. Clean-strip reproducibility and substrate sensitivity
-
-Four independent unused strips from the same batch and instrumental series show extremely high spectral reproducibility. The minimum pairwise Pearson correlation is **`r format(strip_min_pearson, digits = 8)`**, the minimum pairwise Spearman correlation is **`r format(strip_min_spearman, digits = 8)`**, integrated-absorbance CV is **`r fmt(strip_integrated_cv, 2)`%**, median pointwise CV is **`r fmt(strip_median_cv, 2)`%**, and the 95th percentile of pointwise CV is **`r fmt(strip_p95_cv, 2)`%**.
-
-All individual clean-strip references identify Cluster 1 as the nearest baseline pediatric cluster. Residualization against every individual strip or against the four-strip consensus produces the same residual partition; thus the conclusion is not attributable to an idiosyncratic reference strip or to between-strip spectral heterogeneity.
-
-At the same time, removing the substrate-aligned direction changes the partition (**ARI = `r fmt(strip_resid_ari, 3)`**), and excluding the D1-dominant 870--1121 cm^-1 region gives **ARI = `r fmt(no_d1_ari, 3)`**. These results distinguish negligible *between-strip variability* from a potentially important *sample-to-substrate signal contribution*.
-
-```{r}
-#| label: figure4
-#| echo: false
-#| fig-cap: "Supplementary reference projection, clean-strip centroid distances, and reproducibility of independent unused strips."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure4_reference_projection_strip_reproducibility.png"))
-)
-```
-
-## Technical reproducibility metrics
-
-```{r}
-#| label: strip-technical-table
-
-kable_clean(
-  strip_obj$technical_summary,
-  digits = 6
-)
-```
-
-## Reference-invariance analysis
-
-```{r}
-#| label: strip-reference-invariance
-
-kable_clean(
-  strip_obj$reference_residualization_summary,
-  digits = 4
-)
-```
-
-```{r}
-#| label: substrate-sensitivity-figure
-#| echo: false
-#| fig-cap: "Sensitivity of the pediatric partition to substrate-associated signal."
-
-knitr::include_graphics(
-  require_file(p("figures", "FigureS3_substrate_D1_sensitivity.png"))
-)
-```
-
-# 13. Spectral domains D1--D5
-
-The secondary supervised characterization used PLS-DA with three components. For each spectral variable, the maximum VIP across the three components was calculated. Variables with summary **VIP > 1** were ordered by wavenumber and grouped into contiguous regions, with gaps greater than 5 cm^-1 delimiting separate intervals.
-
-This reproduces five VIP-enriched spectral domains:
-
-- D1: 876--1127 cm^-1
-- D2: 1150--1313 cm^-1
-- D3: 1382--1413 cm^-1
-- D4: 1477--1706 cm^-1
-- D5: 2942--3092 cm^-1
-
-The old "top 50 VIP variables define D1--D5" wording is not used in the revised workflow.
-
-```{r}
-#| label: vip-regions
-
-kable_clean(
-  domain_obj$vip_regions,
-  digits = 4,
-  caption = "VIP > 1 contiguous regions reproduced by the public script."
-)
-```
-
-## Descriptive post-clustering domain characterization
-
-The D1--D5 domains and the cluster labels were derived from the same pediatric spectral dataset. Therefore, domain-level inferential tests are not displayed or used as independent inferential validation in this report. The frozen exploratory test outputs remain available among the machine-readable analysis tables for auditability, but the manuscript interpretation is based on descriptive cluster-wise domain distributions and signed multidomain profiles.
-
-```{r}
-#| label: figure5
-#| echo: false
-#| fig-cap: "Participant-level D1-D5 domain measures across the three pediatric GCF spectral clusters."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure5_D1_D5_domain_distributions.png"))
-)
-```
-
-# 14. Raw absorbance profiles and multidomain signatures
-
-```{r}
-#| label: figure6
-#| echo: false
-#| fig-cap: "Median raw absorbance spectra with interquartile ranges and D1-D5 intervals."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure6_raw_median_IQR_spectra_domains.png"))
-)
-```
-
-The standardized cluster signatures show the expected complementary profiles: Cluster 1 is high in D1 and low in D5; Cluster 2 shows the strongest D4 elevation and lower D2; Cluster 3 is low in D1 and high in D2, D3, and D5.
-
-```{r}
-#| label: domain-signatures
-
-kable_clean(
-  domain_obj$cluster_domain_signatures,
-  digits = 4
-)
-```
-
-```{r}
-#| label: figure7
-#| echo: false
-#| fig-cap: "Signed standardized cluster-level deviations across D1-D5."
-
-knitr::include_graphics(
-  require_file(p("figures", "Figure7_signed_domain_heatmap.png"))
-)
-```
-
-# 15. Exploratory adult GCF reference mapping
-
-The archived adult GCF reference is analyzed separately from the pediatric cohort. The public release contains the **18 x 793** de-identified harmonized adult SNV spectral matrix and aggregate adult-reference summaries. Individual-level adult clinical metadata and source-linked labels are intentionally not distributed.
-
-The harmonized adult PCA uses the same analytical windows as the pediatric analysis, **3400--2800 and 1800--870 cm^-1**, with row-wise SNV and no additional variable scaling. Historical-to-harmonized component correspondence and adult clinical-axis associations are supplied as frozen aggregate summaries because their source-level metadata are not public.
-
-```{r}
-#| label: adult-settings
-
-adult_settings <- data.frame(
-  item = c(
-    "Reference spectra used",
-    "Retained spectral variables",
-    "Analytical windows",
-    "Preprocessing",
-    "Historical PC1 correspondence",
-    "Historical PC2 correspondence",
-    "Historical PC4 correspondence",
-    "Historical PC5 correspondence"
+  tibble::tibble(
+    Procedure = "Repeated 80% subsampling",
+    Mean_ARI = robustness$subsampling_summary$mean_ARI,
+    Median_ARI = robustness$subsampling_summary$median_ARI,
+    Exact_recovery_percent = 100 * robustness$subsampling_summary$proportion_ARI_1
   ),
-  value = c(
-    adult_obj$settings$n_reference_spectra,
-    adult_obj$settings$retained_variables,
-    "3400-2800 + 1800-870 cm^-1",
-    adult_obj$settings$preprocessing,
-    "harmonized PC2",
-    "harmonized PC1",
-    "harmonized PC4",
-    "harmonized PC5"
+  tibble::tibble(
+    Procedure = "Participant bootstrap",
+    Mean_ARI = robustness$bootstrap_summary$mean_ARI,
+    Median_ARI = robustness$bootstrap_summary$median_ARI,
+    Exact_recovery_percent = 100 * robustness$bootstrap_summary$proportion_ARI_1
   )
 )
 
-kable_clean(adult_settings)
+kable_clean(resampling_summary, digits = 3)
 ```
 
-## Historical-to-harmonized axis correspondence
+# 5. Sex-associated spectral variation
+
+Sex is associated with the baseline exploratory partition (Fisher p = **`r fmt_p(sex_obj$sex_cluster_association$fisher_p_value)`**; Cramer's V = **`r fmt(sex_obj$sex_cluster_association$cramers_v, 3)`**, 95% bootstrap interval **`r fmt(sex_obj$sex_cluster_association$cramers_v_ci_lower, 3)`–`r fmt(sex_obj$sex_cluster_association$cramers_v_ci_upper, 3)`**).
+
+Among the three planned PC comparisons, PC1 shows the strongest sex-associated difference (raw p = **`r fmt_p(pc1_row$p_value_raw)`**; BH-adjusted p = **`r fmt_p(pc1_row$p_value_BH)`**; rank-biserial correlation = **`r fmt(pc1_row$rank_biserial_F_vs_M, 3)`**; Hedges g = **`r fmt(pc1_row$hedges_g_F_minus_M, 3)`**).
+
+After feature-wise sex residualization, agreement with the baseline partition is **ARI = `r fmt(sex_res$ARI_vs_baseline, 3)`**. The aligned residualized group sizes are **`r sex_res$residualized_cluster_sizes`**, and **`r sex_res$participants_changing_aligned_assignment`** participants change aligned assignment.
 
 ```{r}
-#| label: adult-axis-matches
-
-kable_clean(
-  selected_axis_matches,
-  digits = 4
-)
-```
-
-## Adult clinical-axis summaries
-
-```{r}
-#| label: adult-clinical-summary
-
-kable_clean(
-  adult_obj$adult_clinical_eta2,
-  digits = 4
-)
-```
-
-## Adult D1--D5 domain mapping
-
-```{r}
-#| label: adult-domain-map
-
-kable_clean(
-  adult_domain_map |>
-    dplyr::select(
-      domain,
-      PC,
-      n_points,
-      mean_loading,
-      median_loading,
-      prop_positive,
-      prop_negative,
-      direction_class,
-      domain_level_interpretation
-    ),
-  digits = 4
-)
-```
-
-```{r}
-#| label: adult-loadings-figure
+#| label: sex-figure
 #| echo: false
-#| fig-cap: "Harmonized adult-reference PC2, PC4, and PC5 loading profiles used for exploratory domain-level cross-cohort interpretation."
+#| fig-cap: "Sex-associated variation and the partition obtained after feature-wise sex residualization."
 
-knitr::include_graphics(
-  require_file(p("figures", "FigureS4_adult_PC2_PC4_PC5_loading_profiles.png"))
+knitr::include_graphics(require_file(p(main_figure_files[[4]])))
+```
+
+```{r}
+#| label: sex-pc-table
+#| echo: false
+
+kable_clean(
+  S2,
+  digits = 4,
+  caption = "Sex associations for PC1–PC3 with Benjamini–Hochberg adjustment and effect sizes."
 )
 ```
 
-The public adult module independently recomputes the harmonized PCA and D1--D5 loading summaries from the de-identified adult spectral matrix and verifies them against the frozen aggregate result bundle. It does **not** recreate individual-level adult clinical associations because the individual adult clinical metadata are not distributed.
+# 6. Clean-strip technical reproducibility and sensitivity
 
-# 16. Revision-ready key results
+The four independent unused strips show very high reproducibility: minimum pairwise Pearson r = **`r fmt(strip_min_pearson, 6)`**, minimum pairwise Spearman rho = **`r fmt(strip_min_spearman, 6)`**, integrated-absorbance CV = **`r fmt(strip_integrated_cv, 3)`%**, median pointwise CV = **`r fmt(strip_median_cv, 3)`%**, and 95th-percentile pointwise CV = **`r fmt(strip_p95_cv, 3)`%**.
 
-The following compact table summarizes the frozen numerical results used in the revised manuscript.
+Removing the direction defined by the mean of the four independent strips changes the exploratory partition to **ARI = `r fmt(strip_resid_ari, 3)`** relative to baseline; **`r as.integer(round(strip_changed_n))`** participants change aligned assignment. This procedure is treated as a sensitivity analysis, not as a corrected biological partition.
 
 ```{r}
-#| label: key-results
+#| label: clean-strip-figure
+#| echo: false
+#| fig-cap: "Clean-strip reproducibility, supplementary projection, and sensitivity to removal of the independently defined strip-aligned direction."
 
-key_results <- data.frame(
-  topic = c(
-    "Pediatric analytical matrix",
-    "Baseline PCA",
-    "Baseline clustering",
-    "Baseline silhouette",
-    "LOO stability",
-    "80% subsampling",
-    "Bootstrap stability",
-    "Sex x cluster",
-    "PC1 sex association",
-    "Sex-residualized clustering",
-    "Independent strip reproducibility",
-    "Strip-aligned sensitivity",
-    "D1 exclusion sensitivity",
-    "Adult reference",
-    "Adult axis matching",
-    "Adult domain mapping"
-  ),
-  result = c(
-    paste0(n_pediatric, " x ", n_variables),
-    paste0(
-      baseline_pc,
-      " PCs; ",
-      fmt(baseline_variance, 2),
-      "% cumulative variance"
-    ),
-    paste0("k = 3; sizes ", paste(cluster_sizes, collapse = "/")),
-    fmt(baseline_sil, 3),
-    paste0("mean ARI ", fmt(loo_mean, 3), "; median ", fmt(loo_median, 3)),
-    paste0("mean ARI ", fmt(sub_mean, 3), "; median ", fmt(sub_median, 3)),
-    paste0("mean ARI ", fmt(boot_mean, 3), "; median ", fmt(boot_median, 3)),
-    paste0("Fisher p = ", fmt_p(sex_cluster_p), "; V = ", fmt(sex_cluster_v, 3)),
-    paste0("Wilcoxon p = ", fmt_p(pc1_sex_p), "; Hedges g = ", fmt(pc1_g, 2)),
-    paste0("ARI = ", fmt(sex_resid_ari, 3), "; Fisher p = ", fmt_p(sex_resid_p)),
-    paste0(
-      "min Pearson r = ",
-      format(strip_min_pearson, digits = 8),
-      "; integrated CV = ",
-      fmt(strip_integrated_cv, 2),
-      "%"
-    ),
-    paste0("ARI = ", fmt(strip_resid_ari, 3)),
-    paste0("ARI = ", fmt(no_d1_ari, 3)),
-    "18 x 793; 3400-2800 + 1800-870 cm^-1; row-wise SNV; PCA scale.unit = FALSE",
-    "historical PC1->PC2; PC2->PC1; PC4->PC4; PC5->PC5",
-    "D1/D2->PC2; D3/D4->PC4; D5->PC5; D4 mixed"
-  )
-)
-
-kable_clean(key_results)
+knitr::include_graphics(require_file(p(main_figure_files[[5]])))
 ```
 
-# 17. Reproducibility files and environment
-
 ```{r}
-#| label: session-files
+#| label: clean-strip-tables
 
-session_files <- c(
-  p("tables", "sessionInfo_PCA_clustering.txt"),
-  p("tables", "sessionInfo_cluster_stability.txt"),
-  p("tables", "sessionInfo_sex_sensitivity.txt"),
-  p("tables", "sessionInfo_strip_reproducibility.txt"),
-  p("tables", "sessionInfo_spectral_domains.txt"),
-  p("tables", "sessionInfo_adult_reference.txt"),
-  p("tables", "sessionInfo_tables_figures.txt")
+kable_clean(
+  S3,
+  digits = 6,
+  caption = "Technical reproducibility of the four independent unused strips."
 )
 
-session_status <- data.frame(
-  file = session_files,
-  exists = file.exists(session_files)
+kable_clean(
+  S4,
+  digits = 4,
+  caption = "Sensitivity results obtained using each independently defined clean-strip direction."
 )
-
-kable_clean(session_status)
 ```
 
-## Current rendering session
+# 7. Participant-level partition transitions
+
+The participant-level comparison combines the baseline, sex-residualized, and clean-strip-residualized partitions after aligning numerical labels for display. Label alignment does not alter ARI.
+
+After sex residualization, **`r n_change_sex`** participants change aligned assignment. After clean-strip-direction residualization, **`r n_change_strip`** change. In total, **`r n_change_either`** participants change in at least one sensitivity analysis, and **`r n_change_both`** change in both.
+
+The sex-residualized and clean-strip-residualized partitions have pairwise **ARI = `r fmt(sex_strip_ari, 3)`**.
 
 ```{r}
-#| label: session-info
+#| label: transition-figure
+#| echo: false
+#| fig-cap: "Participant-level transitions across the baseline, sex-residualized, and clean-strip-residualized exploratory partitions."
+
+knitr::include_graphics(require_file(p(main_figure_files[[6]])))
+```
+
+```{r}
+#| label: pairwise-partition-table
+#| echo: false
+
+kable_clean(
+  S6,
+  digits = 4,
+  caption = "Pairwise agreement among the three exploratory partitions."
+)
+```
+
+# 8. Consolidated publication tables
+
+```{r}
+#| label: table-three
+#| echo: false
+
+kable_clean(
+  Table3,
+  caption = "Consolidated summary of sex-associated and clean-strip sensitivity results."
+)
+```
+
+# 9. Supplementary diagnostic figures
+
+## Repeated-subsampling consensus
+
+```{r}
+#| label: consensus-figure
+#| echo: false
+#| fig-cap: "Pairwise consensus across repeated 80% subsamples."
+
+knitr::include_graphics(require_file(p(supp_figure_files[[1]])))
+```
+
+## Group-specific bootstrap stability
+
+```{r}
+#| label: jaccard-figure
+#| echo: false
+#| fig-cap: "Group-specific Jaccard stability across participant-bootstrap iterations."
+
+knitr::include_graphics(require_file(p(supp_figure_files[[2]])))
+```
+
+## Descriptive raw spectra by exploratory group
+
+```{r}
+#| label: descriptive-spectra-figure
+#| echo: false
+#| fig-cap: "Descriptive median and interquartile raw absorbance spectra by exploratory group."
+
+knitr::include_graphics(require_file(p(supp_figure_files[[3]])))
+```
+
+## Invariance across independent strip directions
+
+```{r}
+#| label: strip-invariance-figure
+#| echo: false
+#| fig-cap: "Agreement among partitions obtained after removing alternative independently measured clean-strip directions."
+
+knitr::include_graphics(require_file(p(supp_figure_files[[4]])))
+```
+
+# 10. Output manifest and machine-readable audit
+
+The publication builder generated **`r nrow(manifest)` outputs**: **`r sum(manifest$category == "main_table")` main tables**, **`r sum(manifest$category == "supplement_table")` supplementary tables**, **`r sum(manifest$category == "main_figure") / 2` main figures**, and **`r sum(manifest$category == "supplement_figure") / 2` supplementary figures**. Both PNG and PDF versions are retained for each figure.
+
+```{r}
+#| label: output-manifest
+#| echo: false
+
+kable_clean(
+  manifest,
+  caption = "Publication-output manifest generated by R/07_tables_figures.R."
+)
+```
+
+The machine-readable report snapshot is written to:
+
+```text
+tables/08_reproducibility_report_key_numbers.csv
+```
+
+The automated scope checks are written to:
+
+```text
+tables/08_reproducibility_report_scope_checks.csv
+```
+
+# 11. Reproducibility interpretation
+
+The numerical results support five bounded conclusions:
+
+1. The pediatric measurements contain structured multivariate spectral variation.
+2. The three-group representation is useful descriptively but shows specification dependence and uneven group stability.
+3. Sex-associated spectral variation contributes substantially to the baseline organization.
+4. The unused strips are highly reproducible, while removal of an independently defined strip-aligned direction materially changes participant assignments.
+5. The current design does not justify treating the exploratory groups as discrete biological or clinical entities.
+
+```{r}
+#| label: key-number-snapshot
+#| echo: false
+
+kable_clean(
+  key_numbers,
+  digits = 6,
+  caption = "Machine-readable numerical snapshot used for manuscript reconstruction."
+)
+```
+
+# 12. Session information
+
+```{r}
+#| label: session-information
 
 sessionInfo()
 ```
-
-# 18. Computational status
-
-The public reproducibility workflow is:
-
-- `01_validate_public_inputs.R` — integrity checks for de-identified processed pediatric inputs
-- `02_pca_clustering.R` — baseline three-PC PCA / Euclidean Ward.D2 hierarchical clustering
-- `03_cluster_stability.R` — cluster-number evaluation, PCA-dimensionality sensitivity, LOO, subsampling, bootstrap, and consensus
-- `04_sex_sensitivity.R` — clinical metadata and sex-sensitivity analyses
-- `05_strip_reproducibility.R` — clean-strip reproducibility and substrate-sensitivity analyses
-- `06_spectral_domains.R` — post-clustering PLS-DA/VIP characterization and D1--D5 analyses
-- `07_adult_reference_public.R` — harmonized adult PCA/loading reproduction plus checks against frozen aggregate adult summaries
-- `08_tables_figures.R` — final publication tables and figures
-

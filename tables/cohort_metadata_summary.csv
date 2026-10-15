@@ -1,0 +1,15 @@
+variable,category,n,mean,sd,median,min,max
+age,overall,25,11.92,3.365511352924941,13,6,17
+sex,F,12,NA,NA,NA,NA,NA
+sex,M,13,NA,NA,NA,NA,NA
+pubertal_development,Normal,8,NA,NA,NA,NA,NA
+pubertal_development,Early,3,NA,NA,NA,NA,NA
+pubertal_development,Delayed,1,NA,NA,NA,NA,NA
+pubertal_development,Unknown,13,NA,NA,NA,NA,NA
+endocrine_status,No documented pathology,5,NA,NA,NA,NA,NA
+endocrine_status,Documented pathology,19,NA,NA,NA,NA,NA
+endocrine_status,Unknown,1,NA,NA,NA,NA,NA
+uctd_status,No documented pathology,3,NA,NA,NA,NA,NA
+uctd_status,Documented pathology,22,NA,NA,NA,NA,NA
+periodontal_status,No documented pathology,22,NA,NA,NA,NA,NA
+periodontal_status,Documented pathology,3,NA,NA,NA,NA,NA

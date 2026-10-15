@@ -1,0 +1,4 @@
+comparison,ARI,same_aligned_label_n,different_aligned_label_n
+Baseline vs Sex-residualized,0.1341396371632765,15,10
+Baseline vs Clean-strip-residualized,0.4071146245059289,18,7
+Sex-residualized vs Clean-strip-residualized,0.7006272571754418,22,3

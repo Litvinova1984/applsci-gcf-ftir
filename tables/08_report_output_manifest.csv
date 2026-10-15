@@ -1,0 +1,6 @@
+"category","path","exists","size_bytes","md5"
+"source","analysis/revision_report.qmd",TRUE,27745,"f63d168eaf6add9f95dfa4fc7c06b4d4"
+"rendered_report","analysis/revision_report.html",TRUE,8546128,"e3d283a77ab2b38f158cb2d7cca137b9"
+"audit_table","tables/08_reproducibility_report_key_numbers.csv",TRUE,2540,"bf72e68eeab2cf1ccde8900768759dea"
+"audit_table","tables/08_reproducibility_report_scope_checks.csv",TRUE,257,"2f53ae001431ffb6a6911c80d6a9d9a3"
+"session_info","tables/sessionInfo_reproducibility_report.txt",TRUE,2164,"ca3a034fc531b208407f1d24a0e133a1"

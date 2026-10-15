@@ -1,0 +1,6 @@
+metric,value
+Participants changing after sex residualization,10
+Participants changing after clean-strip residualization,7
+Participants changing in either sensitivity analysis,10
+Participants changing in both sensitivity analyses,7
+Participants assigned to the same cluster after both residualizations,22

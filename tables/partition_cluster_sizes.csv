@@ -1,0 +1,10 @@
+partition,cluster,n
+Baseline,1,15
+Baseline,2,4
+Baseline,3,6
+Sex_residualized,1,8
+Sex_residualized,2,14
+Sex_residualized,3,3
+Clean_strip_residualized,1,8
+Clean_strip_residualized,2,11
+Clean_strip_residualized,3,6

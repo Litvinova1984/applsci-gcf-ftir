@@ -1,0 +1,39 @@
+section,metric,value_numeric,value_text
+Baseline,Retained PCs,3,3
+Baseline,Cumulative variance explained (%),89.28182549155746,89.28182549
+Baseline,Baseline k,3,3
+Baseline,Cluster sizes,NA,15/4/6
+Baseline,Average silhouette,0.43424880431780954,0.4342488043
+Baseline,Participants with negative silhouette,0,0
+PCA dimensionality sensitivity,PC counts with exact baseline recovery,NA,"2,3,5,6"
+PCA dimensionality sensitivity,Number of tested PC counts,6,6
+PCA dimensionality sensitivity,Number with exact baseline recovery,4,4
+k = 3 versus k = 2,Silhouette k=2,0.4376790349403969, 0.4376790349
+k = 3 versus k = 2,Silhouette k=3,0.43424880431780954, 0.4342488043
+k = 3 versus k = 2,Calinski-Harabasz k=2,17.646304108711554,17.6463041087
+k = 3 versus k = 2,Calinski-Harabasz k=3,21.111927430986757,21.1119274310
+k = 3 versus k = 2,Davies-Bouldin k=2,0.8975678104256992, 0.8975678104
+k = 3 versus k = 2,Davies-Bouldin k=3,0.7422319633909885, 0.7422319634
+Leave-one-out,Mean ARI,0.8107124012133443,0.8107124012
+Leave-one-out,Median ARI,1,1.0000000000
+Leave-one-out,Exact recovery proportion,0.68,0.6800000000
+Leave-one-out,ARI >= 0.8 proportion,0.72,0.7200000000
+80% subsampling,Mean ARI,0.6418108439261011,0.6418108439
+80% subsampling,Median ARI,0.5809337091042764,0.5809337091
+80% subsampling,Exact recovery proportion,0.326,0.3260000000
+80% subsampling,ARI >= 0.8 proportion,0.427,0.4270000000
+Pairwise consensus,Within-cluster mean consensus,0.7488585953963259,0.74885859540
+Pairwise consensus,Within-cluster median consensus,0.8472663940633045,0.84726639406
+Pairwise consensus,Between-cluster mean consensus,0.11484899130185988,0.11484899130
+Pairwise consensus,Between-cluster median consensus,0.0197719660239091,0.01977196602
+Bootstrap,Mean ARI,0.5794283127631237, 0.5794283128
+Bootstrap,Median ARI,0.5048104131295982, 0.5048104131
+Bootstrap,Exact recovery proportion,0.119, 0.1190000000
+Bootstrap,ARI >= 0.8 proportion,0.294, 0.2940000000
+Bootstrap,Mean unique participants per bootstrap sample,15.992,15.9920000000
+Bootstrap cluster-specific Jaccard,Cluster 1 mean Jaccard,0.7539560283283967,0.7539560283
+Bootstrap cluster-specific Jaccard,Cluster 2 mean Jaccard,0.5336324406845304,0.5336324407
+Bootstrap cluster-specific Jaccard,Cluster 3 mean Jaccard,0.819446047008547,0.8194460470
+Cluster-specific silhouette,Cluster 1 mean silhouette,0.4484225246257122,0.4484225246
+Cluster-specific silhouette,Cluster 2 mean silhouette,0.5141523310435248,0.5141523310
+Cluster-specific silhouette,Cluster 3 mean silhouette,0.3455454857309096,0.3455454857

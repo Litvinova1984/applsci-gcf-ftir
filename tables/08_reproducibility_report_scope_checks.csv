@@ -1,0 +1,7 @@
+check,expected,observed,passed
+Pediatric active spectra,25,25,TRUE
+Spectral-variable count,793,793,TRUE
+Participant transition rows,25,25,TRUE
+Continuous loading rows,793,793,TRUE
+Publication manifest rows,30,30,TRUE
+All manifest paths exist,TRUE,TRUE,TRUE

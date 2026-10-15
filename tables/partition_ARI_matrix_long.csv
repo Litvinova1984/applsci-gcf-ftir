@@ -1,0 +1,10 @@
+partition_1,partition_2,ARI
+Baseline,Baseline,1
+Sex_residualized,Baseline,0.1341396371632765
+Clean_strip_residualized,Baseline,0.4071146245059289
+Baseline,Sex_residualized,0.1341396371632765
+Sex_residualized,Sex_residualized,1
+Clean_strip_residualized,Sex_residualized,0.7006272571754418
+Baseline,Clean_strip_residualized,0.4071146245059289
+Sex_residualized,Clean_strip_residualized,0.7006272571754418
+Clean_strip_residualized,Clean_strip_residualized,1

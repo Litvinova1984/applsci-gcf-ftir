@@ -1,0 +1,8 @@
+check,observed,expected,matches
+n_participants,25,25,TRUE
+age_min,6,6,TRUE
+age_max,17,17,TRUE
+age_mean,11.92,11.92,TRUE
+age_sd,3.365511352924941,3.37,TRUE
+sex_F,12,12,TRUE
+sex_M,13,13,TRUE
