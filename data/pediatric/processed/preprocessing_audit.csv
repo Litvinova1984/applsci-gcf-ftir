@@ -1,0 +1,11 @@
+item,value
+Selected source spectra,30
+Active pediatric spectra,25
+Supplementary/reference spectra,5
+Retained spectral variables,793
+Highest retained wavenumber,3399.008061647415
+Lowest retained wavenumber,870.5012128353119
+Mean X_active,0.020296692858740112
+SD X_active,0.012029738088536957
+Maximum absolute SNV row mean,6.680938554238647e-15
+Maximum absolute deviation of SNV row SD from 1,1.7763568394002505e-15

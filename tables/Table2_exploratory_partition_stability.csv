@@ -1,0 +1,23 @@
+Analysis,Metric,Value
+Baseline representation,Participants,25
+Baseline representation,Spectral variables,793
+Baseline representation,Retained principal components,3
+Baseline representation,Cumulative variance explained (%),89.28
+Baseline representation,Exploratory group sizes,15/4/6
+Baseline representation,Average silhouette,0.434
+PCA dimensionality sensitivity,Tested PC counts,"2, 3, 4, 5, 6, 7"
+PCA dimensionality sensitivity,PC counts reproducing the baseline partition,"2, 3, 5, 6"
+PCA dimensionality sensitivity,Number reproducing the baseline partition,4
+Leave-one-out,Mean ARI,0.811
+Leave-one-out,Median ARI,1.000
+Leave-one-out,Exact recovery (%),68.0
+Repeated 80% subsampling,Mean ARI,0.642
+Repeated 80% subsampling,Median ARI,0.581
+Repeated 80% subsampling,Within-group mean consensus,0.749
+Repeated 80% subsampling,Between-group mean consensus,0.115
+Participant bootstrap,Mean ARI,0.579
+Participant bootstrap,Median ARI,0.505
+Participant bootstrap,Exact recovery (%),11.9
+Participant bootstrap,Group 1 mean Jaccard,0.754
+Participant bootstrap,Group 2 mean Jaccard,0.534
+Participant bootstrap,Group 3 mean Jaccard,0.819

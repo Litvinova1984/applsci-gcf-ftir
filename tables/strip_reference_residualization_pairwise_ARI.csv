@@ -1,9 +1,9 @@
 reference_1,reference_2,ARI
-archived_etalon,strip_01,1
-archived_etalon,strip_02,1
-archived_etalon,strip_03,1
-archived_etalon,strip_04,1
-archived_etalon,mean_four_strips,1
+archived_clean_strip,strip_01,1
+archived_clean_strip,strip_02,1
+archived_clean_strip,strip_03,1
+archived_clean_strip,strip_04,1
+archived_clean_strip,mean_four_strips,1
 strip_01,strip_02,1
 strip_01,strip_03,1
 strip_01,strip_04,1

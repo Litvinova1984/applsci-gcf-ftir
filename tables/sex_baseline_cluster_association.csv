@@ -1,0 +1,2 @@
+n,fisher_p_value,cramers_v,cramers_v_ci_lower,cramers_v_ci_upper,valid_bootstrap
+25,0.0029950195181046926,0.6400954789890507,0.41389088902293353,0.9185586535436918,5000

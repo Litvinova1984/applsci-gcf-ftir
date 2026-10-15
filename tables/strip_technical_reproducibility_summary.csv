@@ -8,3 +8,4 @@ Median pointwise CV (%),0.8542025069922996
 95th percentile pointwise CV (%),1.174046212992733
 Archived strip vs four-strip mean Pearson,0.9999991825802927
 Archived strip vs four-strip mean Spearman,0.9999957948683891
+Maximum DPT-vs-archived grid difference (cm^-1),4.995956487618969e-6

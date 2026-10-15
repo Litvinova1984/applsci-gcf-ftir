@@ -1,26 +1,16 @@
-ID,Age,Sex,Pubertal Development,Endocrine Status,UCTD Status,Periodontal Status
-1,12,F,Normal,Documented pathology,Documented pathology,No documented pathology
-2,6,M,Normal,Documented pathology,Documented pathology,No documented pathology
-3,6,M,Normal,Documented pathology,Documented pathology,No documented pathology
-4,9,F,Normal,Documented pathology,Documented pathology,No documented pathology
-5,13,M,Delayed,No documented pathology,Documented pathology,No documented pathology
-6,14,M,Normal,Documented pathology,Documented pathology,No documented pathology
-7,13,M,Normal,Documented pathology,Documented pathology,No documented pathology
-8,10,F,Early,No documented pathology,Documented pathology,No documented pathology
-9,11,F,Normal,Documented pathology,Documented pathology,No documented pathology
-10,14,F,Normal,Documented pathology,Documented pathology,No documented pathology
-11,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology
-12,14,M,Unknown,Documented pathology,Documented pathology,No documented pathology
-13,8,F,Early,Documented pathology,Documented pathology,No documented pathology
-14,7,F,Unknown,Documented pathology,Documented pathology,No documented pathology
-15,7,F,Early,Documented pathology,Documented pathology,No documented pathology
-16,16,F,Unknown,Documented pathology,Documented pathology,No documented pathology
-17,11,F,Unknown,Documented pathology,Documented pathology,No documented pathology
-18,9,M,Unknown,Unknown,Documented pathology,No documented pathology
-19,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology
-20,13,M,Unknown,Documented pathology,Documented pathology,No documented pathology
-21,14,M,Unknown,No documented pathology,No documented pathology,Documented pathology
-22,16,F,Unknown,No documented pathology,No documented pathology,Documented pathology
-23,16,F,Unknown,No documented pathology,No documented pathology,Documented pathology
-24,17,M,Unknown,Documented pathology,Documented pathology,No documented pathology
-25,16,M,Unknown,Documented pathology,Documented pathology,No documented pathology
+Characteristic,Category,Value
+"Age, years",Mean +/- SD,11.92 +/- 3.37
+"Age range, years",Minimum-maximum,6-17
+Sex,Female,12 (48.0%)
+Sex,Male,13 (52.0%)
+Pubertal development,Normal,8 (32.0%)
+Pubertal development,Early,3 (12.0%)
+Pubertal development,Delayed,1 (4.0%)
+Pubertal development,Unknown / insufficient information,13 (52.0%)
+Endocrine status,Documented pathology,19 (76.0%)
+Endocrine status,No documented pathology,5 (20.0%)
+Endocrine status,Unknown,1 (4.0%)
+UCTD status,Documented pathology,22 (88.0%)
+UCTD status,No documented pathology,3 (12.0%)
+Periodontal status,Documented pathology,3 (12.0%)
+Periodontal status,No documented pathology,22 (88.0%)

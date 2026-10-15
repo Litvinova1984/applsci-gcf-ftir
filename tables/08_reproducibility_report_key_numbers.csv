@@ -1,0 +1,40 @@
+section,metric,value_numeric,value_text
+Data,Participants,25,25
+Data,Spectral variables,793,793
+Baseline PCA,PC1 variance (%),48.2763440298831,48.276
+Baseline PCA,PC2 variance (%),32.3704164175324,32.370
+Baseline PCA,PC3 variance (%),8.635065044141962,8.635
+Baseline PCA,Cumulative variance PC1-PC3 (%),89.28182549155746,89.282
+Baseline PCA,Average silhouette,0.43424880431780954,0.434
+Baseline partition,Group 1 n,15,15
+Baseline partition,Group 2 n,4,4
+Baseline partition,Group 3 n,6,6
+Stability,Leave-one-out mean ARI,0.8107124012133443,0.811
+Stability,Leave-one-out median ARI,1,1.000
+Stability,Leave-one-out exact recovery proportion,0.68,0.680
+Stability,80% subsampling mean ARI,0.6418108439261011,0.642
+Stability,80% subsampling median ARI,0.5809337091042764,0.581
+Stability,Within-group mean consensus,0.7488585953963259,0.749
+Stability,Between-group mean consensus,0.11484899130185988,0.115
+Stability,Bootstrap mean ARI,0.5794283127631237,0.579
+Stability,Bootstrap median ARI,0.5048104131295982,0.505
+Sex-associated variation,Sex-partition Fisher p,0.0029950195181046926,0.003
+Sex-associated variation,Sex-partition Cramer's V,0.6400954789890507,0.640
+Sex-associated variation,PC1 raw p,0.015971770859373496,0.016
+Sex-associated variation,PC1 BH-adjusted p,0.047915312578120484,0.048
+Sex-associated variation,PC1 rank-biserial correlation,-0.5641025641025641,-0.564
+Sex-associated variation,PC1 Hedges g,-1.1743108394178734,-1.174
+Sex-associated variation,Sex-residualized ARI vs baseline,0.1341396371632765,0.134
+Sex-associated variation,Sex-residualized average silhouette,0.3380496093426004,0.338
+Sex-associated variation,Participants changing after sex residualization,10,10
+Clean-strip analysis,Minimum pairwise Pearson r,0.9999889915461593,0.999989
+Clean-strip analysis,Minimum pairwise Spearman rho,0.9999822469862572,0.999982
+Clean-strip analysis,Integrated absorbance CV (%),0.8187663943672774,0.819
+Clean-strip analysis,Median pointwise CV (%),0.8542025069922996,0.854
+Clean-strip analysis,95th percentile pointwise CV (%),1.174046212992733,1.174
+Clean-strip analysis,Residualized ARI vs baseline,0.4071146245059289,0.407
+Clean-strip analysis,Residualized average silhouette,0.37126592298544275,0.371
+Clean-strip analysis,Participants changing after residualization,7,7
+Partition comparison,ARI: sex-residualized vs clean-strip-residualized,0.7006272571754418,0.701
+Partition comparison,Participants changing in either sensitivity analysis,10,10
+Partition comparison,Participants changing in both sensitivity analyses,7,7

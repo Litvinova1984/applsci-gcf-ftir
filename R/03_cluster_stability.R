@@ -17,18 +17,15 @@
 #   A. Sensitivity to the number of retained PCs
 #   B. Sensitivity to the number of clusters
 #   C. Baseline cluster-wise silhouette diagnostics
-#   C1. Additional full-SNV characterization (full-space silhouette,
-#       PERMANOVA, and betadisper; inferential outputs retained for
-#       auditability but not used as independent cluster validation)
 #   D. Leave-one-out stability
 #   E. Repeated 80% subsampling and pairwise consensus
 #   F. Participant-level bootstrap stability
 #
 # All numerical outputs used for reporting are written to
-# tables/ and data/pediatric/processed/. In particular,
-# baseline_internal_characterization_full_snv.csv keeps the
-# full-spectral-space silhouette, PERMANOVA, and betadisper
-# results separate from the primary 3-PC robustness analyses.
+# tables/ and data/pediatric/processed/. The robustness analysis
+# is restricted to geometry and resampling procedures that match
+# the prespecified PCA/clustering workflow. No inferential test is
+# applied to cluster labels derived from the same spectra.
 # ============================================================
 
 
@@ -52,7 +49,6 @@ required_pkgs <- c(
   "FactoMineR",
   "cluster",
   "mclust",
-  "vegan",
   "tibble",
   "dplyr",
   "readr",
@@ -112,10 +108,33 @@ dir.create(
 )
 
 
+# Remove outputs from the retired full-SNV PERMANOVA/betadisper
+# branch so that a rerun cannot leave stale files beside the
+# exploratory reframe outputs.
+legacy_full_snv_outputs <- c(
+  file.path(
+    tables_dir,
+    "baseline_silhouette_full_snv_by_participant.csv"
+  ),
+  file.path(
+    tables_dir,
+    "baseline_internal_characterization_full_snv.csv"
+  ),
+  file.path(
+    processed_dir,
+    "baseline_internal_characterization_full_snv.rds"
+  )
+)
+
+unlink(
+  legacy_full_snv_outputs[file.exists(legacy_full_snv_outputs)]
+)
+
+
 if (!file.exists(x_file)) {
   stop(
     "pediatric_X_snv.rds not found. ",
-    "Run R/01_validate_public_inputs.R and verify the public processed inputs."
+    "Run R/01_import_preprocess.R first."
   )
 }
 
@@ -1056,227 +1075,6 @@ readr::write_csv(
   file.path(
     tables_dir,
     "baseline_silhouette_by_cluster.csv"
-  )
-)
-
-
-# ============================================================
-# C1. ADDITIONAL INTERNAL CHARACTERIZATION IN FULL SNV SPACE
-# ============================================================
-#
-# The baseline clustering itself is defined in the retained
-# three-PC score space, so the 3-PC silhouette above is the
-# geometry directly matched to the clustering procedure.
-#
-# For continuity with the original spectral-space description,
-# this section also evaluates the same fixed cluster labels in
-# the complete 793-variable SNV-normalized spectral matrix.
-#
-# These quantities answer a different question from the
-# resampling and k-sensitivity analyses above:
-#
-#   - full-space silhouette describes separation when distances
-#     are calculated from all retained SNV spectral variables;
-#   - PERMANOVA quantifies how much of the total spectral
-#     variation is associated with the already-defined clusters;
-#   - betadisper checks whether between-cluster separation could
-#     be accompanied by unequal within-cluster dispersion.
-#
-# Because cluster labels were derived from the same spectra, these
-# calculations are retained for auditability only. In the manuscript
-# and final Supplementary Table S2, PERMANOVA R2 is used only as a
-# descriptive separation measure; PERMANOVA F/p and betadisper
-# inferential outputs are not used as independent validation of the
-# existence or biological meaning of the clusters.
-#
-# The full-space and 3-PC silhouette values are not expected to
-# be identical because they use different distance geometries.
-# ============================================================
-
-full_snv_dist <- stats::dist(
-  X_snv,
-  method = "euclidean"
-)
-
-full_snv_sil <- cluster::silhouette(
-  cluster_baseline,
-  full_snv_dist
-)
-
-full_snv_sil_df <- tibble::tibble(
-  sample_id = rownames(full_snv_sil),
-  cluster = as.integer(
-    full_snv_sil[, "cluster"]
-  ),
-  silhouette_width = as.numeric(
-    full_snv_sil[, "sil_width"]
-  )
-)
-
-full_snv_average_silhouette <- mean(
-  full_snv_sil_df$silhouette_width
-)
-
-
-# PERMANOVA in the complete SNV spectral space.
-# The pseudo-F statistic and R2 do not depend on the random
-# permutation seed; the permutation p-value does.
-
-cluster_factor <- factor(
-  cluster_baseline,
-  levels = sort(
-    unique(cluster_baseline)
-  )
-)
-
-set.seed(SEED)
-
-permanova_full_snv <- vegan::adonis2(
-  X_snv ~ cluster_factor,
-  method = "euclidean",
-  permutations = 9999,
-  by = "terms"
-)
-
-# With by = "terms", the predictor is returned explicitly as
-# the "cluster_factor" row. This makes extraction unambiguous
-# and avoids relying on the default omnibus row name ("Model").
-permanova_cluster_row <-
-  permanova_full_snv[
-    "cluster_factor",
-    ,
-    drop = FALSE
-  ]
-
-if (
-  nrow(permanova_cluster_row) != 1L ||
-  anyNA(
-    c(
-      permanova_cluster_row$R2,
-      permanova_cluster_row$F,
-      permanova_cluster_row$`Pr(>F)`
-    )
-  )
-) {
-  stop(
-    "Could not extract the cluster term from the PERMANOVA table."
-  )
-}
-
-permanova_R2 <- as.numeric(
-  permanova_cluster_row$R2
-)
-
-permanova_F <- as.numeric(
-  permanova_cluster_row$F
-)
-
-permanova_p <- as.numeric(
-  permanova_cluster_row$`Pr(>F)`
-)
-
-
-# Homogeneity of multivariate dispersion in the same complete
-# SNV spectral space. Both the classical ANOVA result and the
-# permutation result are retained; the permutation p-value is
-# the preferred quantity for reporting alongside PERMANOVA.
-
-betadisper_full_snv <- vegan::betadisper(
-  full_snv_dist,
-  group = cluster_factor
-)
-
-betadisper_anova <- stats::anova(
-  betadisper_full_snv
-)
-
-betadisper_anova_F <- as.numeric(
-  betadisper_anova[
-    1,
-    "F value"
-  ]
-)
-
-betadisper_anova_p <- as.numeric(
-  betadisper_anova[
-    1,
-    "Pr(>F)"
-  ]
-)
-
-set.seed(SEED)
-
-betadisper_perm <- vegan::permutest(
-  betadisper_full_snv,
-  permutations = 9999
-)
-
-betadisper_perm_F <- as.numeric(
-  betadisper_perm$tab[
-    1,
-    "F"
-  ]
-)
-
-betadisper_perm_p <- as.numeric(
-  betadisper_perm$tab[
-    1,
-    "Pr(>F)"
-  ]
-)
-
-
-baseline_internal_characterization <-
-  tibble::tibble(
-    metric = c(
-      "Average silhouette in PC1-PC3 clustering space",
-      "Average silhouette in full SNV spectral space",
-      "PERMANOVA R2 in full SNV spectral space",
-      "PERMANOVA pseudo-F in full SNV spectral space",
-      "PERMANOVA permutation p in full SNV spectral space",
-      "Betadisper ANOVA F in full SNV spectral space",
-      "Betadisper ANOVA p in full SNV spectral space",
-      "Betadisper permutation F in full SNV spectral space",
-      "Betadisper permutation p in full SNV spectral space"
-    ),
-    value = c(
-      baseline_average_silhouette,
-      full_snv_average_silhouette,
-      permanova_R2,
-      permanova_F,
-      permanova_p,
-      betadisper_anova_F,
-      betadisper_anova_p,
-      betadisper_perm_F,
-      betadisper_perm_p
-    )
-  )
-
-
-cat("\n========================================\n")
-cat("ADDITIONAL FULL-SNV INTERNAL CHARACTERIZATION\n")
-cat("========================================\n")
-
-print(
-  baseline_internal_characterization,
-  n = Inf,
-  width = Inf
-)
-
-
-readr::write_csv(
-  full_snv_sil_df,
-  file.path(
-    tables_dir,
-    "baseline_silhouette_full_snv_by_participant.csv"
-  )
-)
-
-readr::write_csv(
-  baseline_internal_characterization,
-  file.path(
-    tables_dir,
-    "baseline_internal_characterization_full_snv.csv"
   )
 )
 
@@ -2382,18 +2180,6 @@ consensus_within <- consensus_summary |>
 
 robustness_summary <- dplyr::bind_rows(
 
-  baseline_internal_characterization |>
-    dplyr::transmute(
-      section = "Additional internal characterization (full SNV spectral space)",
-      metric = metric,
-      value_numeric = value,
-      value_text = format(
-        value,
-        digits = 10
-      )
-    ),
-
-
   tibble::tibble(
     section = "Baseline",
     metric = c(
@@ -2658,16 +2444,6 @@ robustness_objects <- list(
     baseline_sil_df,
   baseline_silhouette_by_cluster =
     cluster_silhouette_summary,
-  full_snv_silhouette_by_participant =
-    full_snv_sil_df,
-  baseline_internal_characterization =
-    baseline_internal_characterization,
-  permanova_full_snv =
-    permanova_full_snv,
-  betadisper_full_snv =
-    betadisper_full_snv,
-  betadisper_perm =
-    betadisper_perm,
   loo_results = loo_results,
   loo_summary = loo_summary,
   loo_influence = loo_influence,
@@ -2702,14 +2478,6 @@ saveRDS(
 
 
 # Individual reusable RDS outputs.
-
-saveRDS(
-  baseline_internal_characterization,
-  file.path(
-    processed_dir,
-    "baseline_internal_characterization_full_snv.rds"
-  )
-)
 
 saveRDS(
   pc_results,
@@ -2812,46 +2580,6 @@ cat(
   "Negative baseline silhouette widths: ",
   sum(
     baseline_sil_df$silhouette_width < 0
-  ),
-  "\n",
-  sep = ""
-)
-
-cat(
-  "Full-SNV average silhouette: ",
-  round(
-    full_snv_average_silhouette,
-    3
-  ),
-  "\n",
-  sep = ""
-)
-
-cat(
-  "Full-SNV PERMANOVA R2 / F / p: ",
-  round(
-    permanova_R2,
-    3
-  ),
-  " / ",
-  round(
-    permanova_F,
-    2
-  ),
-  " / ",
-  signif(
-    permanova_p,
-    4
-  ),
-  "\n",
-  sep = ""
-)
-
-cat(
-  "Full-SNV betadisper permutation p: ",
-  signif(
-    betadisper_perm_p,
-    4
   ),
   "\n",
   sep = ""

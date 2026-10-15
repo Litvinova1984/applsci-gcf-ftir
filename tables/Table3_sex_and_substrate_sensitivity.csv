@@ -1,0 +1,22 @@
+Source,Metric,Value
+Sex-associated variation,Sex x baseline partition Fisher p,0.003
+Sex-associated variation,Sex x baseline partition Cramer's V,0.640
+Sex-associated variation,Cramer's V 95% CI,0.414 to 0.919
+Sex-associated variation,PC1 Wilcoxon raw p,0.016
+Sex-associated variation,PC1 Wilcoxon BH-adjusted p,0.048
+Sex-associated variation,PC1 rank-biserial correlation (F vs M),-0.564
+Sex-associated variation,PC1 Hedges g (F minus M),-1.174
+Sex-residualized sensitivity,ARI vs baseline,0.134
+Sex-residualized sensitivity,Aligned group sizes,8/14/3
+Sex-residualized sensitivity,Participants changing aligned assignment,10
+Sex-residualized sensitivity,Average silhouette,0.338
+Sex-residualized sensitivity,Sex x residualized partition Fisher p,0.282
+Clean-strip technical reproducibility,Minimum pairwise Pearson r,0.999989
+Clean-strip technical reproducibility,Minimum pairwise Spearman rho,0.999982
+Clean-strip technical reproducibility,Integrated absorbance CV (%),0.819
+Clean-strip technical reproducibility,Median pointwise CV (%),0.854
+Clean-strip technical reproducibility,95th percentile pointwise CV (%),1.174
+Clean-strip-direction sensitivity,ARI vs baseline,0.407
+Clean-strip-direction sensitivity,Participants changing aligned assignment,7
+Clean-strip-direction sensitivity,Average silhouette,0.371
+Cross-sensitivity comparison,ARI: sex-residualized vs clean-strip-residualized,0.701
