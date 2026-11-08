@@ -1,0 +1,6 @@
+Specification,k,ARI vs frozen k=3,LOO mean ARI,80% subsampling mean ARI,Bootstrap mean ARI
+baseline_original_k3,3,1.000000,0.810712,0.641811,0.579428
+original_k2,2,0.614792,0.963939,0.853341,0.660476
+fingerprint_reSNV_k3,3,0.773816,0.841051,0.778715,0.680818
+fingerprint_reSNV_k2,2,0.614792,1.000000,0.969043,0.778913
+fingerprint_fixedSNV_k3,3,0.448217,0.926605,0.753145,0.609726

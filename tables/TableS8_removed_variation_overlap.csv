@@ -1,0 +1,8 @@
+Metric,Value
+Sex-associated variation removed (%),15.74568
+Clean-strip-aligned variation removed (%),6.967528
+Frobenius cosine between removed matrices,0.214072
+Squared Frobenius cosine,0.045827
+Correlation: clean-strip coefficient with sex (F = 0; M = 1),−0.567284
+Sex-residualized partition ARI vs baseline,0.134140
+Clean-strip-residualized partition ARI vs baseline,0.407115

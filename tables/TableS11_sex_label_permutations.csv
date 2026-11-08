@@ -1,0 +1,7 @@
+Metric,Value
+Observed ARI,0.1341396
+Permutations,4999
+Permutation median ARI,0.4482173
+Permutation ARI q025,0.1341396
+Permutation ARI q975,1.0000000
+Lower-tail empirical p,0.0784
